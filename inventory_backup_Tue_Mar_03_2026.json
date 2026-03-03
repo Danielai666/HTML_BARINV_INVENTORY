@@ -1,0 +1,1776 @@
+{
+  "app": "Inventory Clicker",
+  "schemaVersion": 2,
+  "exportedAt": "2026-03-03T23:26:46.897Z",
+  "store": {
+    "activeNightId": "Tue, Mar 03, 2026",
+    "global": {
+      "pinHash": "",
+      "defaultBucketText": ""
+    },
+    "nights": {
+      "Tue, Mar 03, 2026": {
+        "nightLabel": "Tue, Mar 03, 2026",
+        "locked": false,
+        "closed": true,
+        "items": [
+          "Vodka",
+          "Gin",
+          "Tequila",
+          "Beer",
+          "Red Bull",
+          "Water",
+          "GRAY GOOSE 1.14",
+          "GRAY GOOSE 1.75",
+          "EL JIMADORA 0.750 RAPASEDO",
+          "EL JIMADORA 0.750 BLANCO"
+        ],
+        "sections": [
+          {
+            "bar": "B1-B1",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "ANDY",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B1-B2",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B1-B3",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B1-B4",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B2-B1",
+            "stations": [
+              {
+                "station": "Bartender 2",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B2-B2",
+            "stations": [
+              {
+                "station": "Bartender 2",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B2-B3",
+            "stations": [
+              {
+                "station": "Bartender 2",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B2-B4",
+            "stations": [
+              {
+                "station": "Bartender 2",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B3-B1",
+            "stations": [
+              {
+                "station": "Bartender 3",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B3-B2",
+            "stations": [
+              {
+                "station": "Bartender 3",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B3-B3",
+            "stations": [
+              {
+                "station": "Bartender 3",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B3-B4",
+            "stations": [
+              {
+                "station": "Bartender 3",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B4-B1",
+            "stations": [
+              {
+                "station": "Bartender 4",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B4-B2",
+            "stations": [
+              {
+                "station": "Bartender 4",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B4-B3",
+            "stations": [
+              {
+                "station": "Bartender 4",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B4-B4",
+            "stations": [
+              {
+                "station": "Bartender 4",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B5-B1",
+            "stations": [
+              {
+                "station": "Bartender 5",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B5-B2",
+            "stations": [
+              {
+                "station": "Bartender 5",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B5-B3",
+            "stations": [
+              {
+                "station": "Bartender 5",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B5-B4",
+            "stations": [
+              {
+                "station": "Bartender 5",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B6-B1",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B6-B2",
+            "stations": [
+              {
+                "station": "Bartender 6",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B6-B3",
+            "stations": [
+              {
+                "station": "Bartender 6",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B6-B4",
+            "stations": [
+              {
+                "station": "Bartender 6",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "HECC",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B1-B1T",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "TEATHRE",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B1-B2T",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "TEATHRE",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B2-B1T",
+            "stations": [
+              {
+                "station": "Bartender 2",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "TEATHRE",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B3-B1T",
+            "stations": [
+              {
+                "station": "Bartender 3",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "TEATHRE",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B3-B2T",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "TEATHRE",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B4-B1T",
+            "stations": [
+              {
+                "station": "Bartender 2",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "TEATHRE",
+                "bars_label": ""
+              }
+            ]
+          },
+          {
+            "bar": "B4-B2T",
+            "stations": [
+              {
+                "station": "Bartender 1",
+                "bartender_name": "",
+                "barback": "",
+                "placement": "TEATHRE",
+                "bars_label": ""
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "nightData": {
+    "Tue, Mar 03, 2026": {
+      "state": {
+        "B1-B1": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B1-B2": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B1-B3": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B1-B4": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B2-B1": {
+          "Bartender 2": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B2-B2": {
+          "Bartender 2": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B2-B3": {
+          "Bartender 2": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B2-B4": {
+          "Bartender 2": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B3-B1": {
+          "Bartender 3": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B3-B2": {
+          "Bartender 3": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B3-B3": {
+          "Bartender 3": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B3-B4": {
+          "Bartender 3": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B4-B1": {
+          "Bartender 4": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B4-B2": {
+          "Bartender 4": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B4-B3": {
+          "Bartender 4": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B4-B4": {
+          "Bartender 4": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B5-B1": {
+          "Bartender 5": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B5-B2": {
+          "Bartender 5": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B5-B3": {
+          "Bartender 5": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B5-B4": {
+          "Bartender 5": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B6-B1": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B6-B2": {
+          "Bartender 6": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B6-B3": {
+          "Bartender 6": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B6-B4": {
+          "Bartender 6": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B1-B1T": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B1-B2T": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B2-B1T": {
+          "Bartender 2": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B3-B1T": {
+          "Bartender 3": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B3-B2T": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B4-B1T": {
+          "Bartender 2": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        },
+        "B4-B2T": {
+          "Bartender 1": {
+            "Vodka": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Gin": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Tequila": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Beer": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Red Bull": {
+              "taken": 0,
+              "returned": 0
+            },
+            "Water": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.14": {
+              "taken": 0,
+              "returned": 0
+            },
+            "GRAY GOOSE 1.75": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 RAPASEDO": {
+              "taken": 0,
+              "returned": 0
+            },
+            "EL JIMADORA 0.750 BLANCO": {
+              "taken": 0,
+              "returned": 0
+            }
+          }
+        }
+      },
+      "log": []
+    }
+  }
+}
