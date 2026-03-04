@@ -85,6 +85,25 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
 .itemRow .name{font-weight:700}
 .itemRow .actions{display:flex;gap:8px;align-items:center}
 .itemRow .mini{padding:8px 10px;border-radius:999px;font-size:13px}
+
+/* ── NEW FEATURES CSS ── */
+.btnAmber{background:#9a5c00;border-color:#9a5c00;color:#fff;}
+.btnTeal{background:#0a7a62;border-color:#0a7a62;color:#fff;}
+.grouptab{padding:10px 16px;border-radius:999px;border:2px solid #2a3d6b;background:var(--btn);
+  cursor:pointer;user-select:none;font-weight:800;font-size:14px;}
+.grouptab.active{background:#1a2d62;border-color:#3b64d6;color:#fff;}
+.parBadge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:999px;
+  border:1px solid rgba(255,180,64,.5);color:#ffb340;background:rgba(255,180,64,.1);
+  margin-left:6px;font-weight:700;vertical-align:middle;}
+.itemCard.over-par{border-color:rgba(255,180,64,.5);}
+.stCheck{display:flex;gap:10px;align-items:center;border:1px solid #22325b;
+  border-radius:12px;padding:10px 12px;background:#0b1220;cursor:pointer;user-select:none;}
+.stCheck input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);flex-shrink:0;}
+.archCard{border:1px solid #22325b;border-radius:14px;padding:12px;background:#0b1220;
+  cursor:pointer;transition:border-color .15s;}
+.archCard:hover{border-color:#3352aa;}
+.groupCard{border:2px solid #3b64d6;border-radius:14px;padding:14px;background:#0d1630;margin-bottom:12px;}
+.groupCardHead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
 </style>
 </head>
 <body>
@@ -112,14 +131,23 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
           <button id="exportSheetBtn" class="btnBlue">⬇️ Export “Sheet Style” CSV</button>
           <button id="exportReportBtn" class="btnBlue">🖨️ Export Report (HTML)</button>
           <button id="exportLogBtn" class="btnBlue">⬇️ Export LOG</button>
+          <button id="exportBarSummaryBtn" class="btnBlue">📊 Bar Summary</button>
+          <button id="exportVarianceBtn"   class="btnAmber">📈 Variance</button>
+          <button id="exportAllNightsBtn"  class="btnTeal">🌐 All Nights CSV</button>
+          <button id="historyBtn"          class="btnGray">🕐 History</button>
+          <button id="compareBtn"          class="btnGray">↔️ Compare</button>
+          <button id="bulkApplyBtn"        class="btnGray">🎯 Bulk Apply</button>
           <button id="resetBtn" class="btnRed">🧨 Reset Night</button>
         </div>
       </div>
 
-      <label>Bars</label>
-      <div class="tabs" id="sectionTabs"></div>
+      <label>Groups</label>
+      <div class="tabs" id="groupTabs" style="gap:6px;"></div>
 
-      <label>Stations</label>
+      <label>Bars</label>
+      <div class="tabs" id="sectionTabs" style="gap:6px;"></div>
+
+      <label>Stations (Bartenders)</label>
       <div class="subtabs" id="stationTabs"></div>
 
       <div id="stationMeta" class="stationMeta"></div>
@@ -174,6 +202,48 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
   </div>
 </div>
 
+<!-- COMPARE -->
+<div class="modalBackdrop" id="compareBackdrop">
+  <div class="modal"><div class="flex" style="justify-content:space-between;margin-bottom:10px">
+    <b style="font-size:15px">↔️ Compare Two Nights</b>
+    <button id="closeCompareBtn" class="btnGray miniBtn">✖ Close</button></div>
+    <div class="row" style="margin-bottom:12px">
+      <div><label>Night A</label><select id="compareSelA" style="width:100%"></select></div>
+      <div><label>Night B</label><select id="compareSelB" style="width:100%"></select></div>
+    </div>
+    <div class="rightFlex" style="margin-bottom:14px"><button id="runCompareBtn" class="btnBlue">Compare →</button></div>
+    <div id="compareResult"></div>
+  </div>
+</div>
+<!-- HISTORY -->
+<div class="modalBackdrop" id="historyBackdrop">
+  <div class="modal"><div class="flex" style="justify-content:space-between;margin-bottom:10px">
+    <b style="font-size:15px">🕐 Night Archive</b>
+    <button id="closeHistoryBtn" class="btnGray miniBtn">✖ Close</button></div>
+    <div class="help" style="margin-bottom:10px">Click a night to see its breakdown.</div>
+    <div id="archiveCards" style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"></div>
+    <div id="archiveDetail" style="margin-top:14px"></div>
+  </div>
+</div>
+<!-- BULK APPLY -->
+<div class="modalBackdrop" id="bulkBackdrop">
+  <div class="modal" style="width:min(560px,100%)"><div class="flex" style="justify-content:space-between;margin-bottom:10px">
+    <b style="font-size:15px">🎯 Bulk Apply to Multiple Stations</b>
+    <button id="closeBulkBtn" class="btnGray miniBtn">✖ Close</button></div>
+    <div class="row" style="margin-bottom:10px">
+      <div><label>Item</label><select id="bulkItem" style="width:100%"></select></div>
+      <div><label>Qty</label><input id="bulkQty" type="number" min="1" value="1" style="width:100%"/></div>
+    </div>
+    <label>Select Stations</label>
+    <div id="bulkStationList" class="stGrid" style="max-height:220px;overflow:auto;margin-bottom:12px"></div>
+    <div class="rightFlex" style="gap:8px;flex-wrap:wrap">
+      <button id="bulkSelectAll"   class="btnGray miniBtn">Select All</button>
+      <button id="bulkDeselectAll" class="btnGray miniBtn">Deselect All</button>
+      <button id="bulkTakenBtn"    class="btnGreen">+ Apply Taken</button>
+      <button id="bulkRetBtn"      class="btnRed">− Apply Returned</button>
+    </div>
+  </div>
+</div>
 <!-- Setup modal -->
 <div class="modalBackdrop" id="setupBackdrop" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-label="Setup">
@@ -210,8 +280,13 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
         <div class="help" style="margin-top:8px;">
           Tip: keep it short so it looks nice on exports.
         </div>
+        <label style="margin-top:10px;">Copy setup from another night</label>
+        <div class="flex">
+          <select id="copyFromSelect" style="min-width:200px;flex:1;"></select>
+          <button id="copySetupBtn" class="btnTeal miniBtn">Copy Setup →</button>
+        </div>
+        <div class="help" style="margin-top:4px;">Copies groups, bars, stations &amp; items — NOT counts.</div>
       </div>
-
       <div class="box">
         <b>Items (Booze)</b>
         <div class="help" style="margin-top:6px;">
@@ -245,6 +320,12 @@ Red Bull"></textarea>
 
 
     
+    <div class="box" id="parLevelsBox">
+      <b>Par Levels</b>
+      <div class="help" style="margin-top:6px;">Expected NET per station — shown as badge on item cards and used in Variance Report. Set 0 to disable.</div>
+      <div id="parLevelsList" class="stGrid" style="margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));"></div>
+    </div>
+    <hr />
     <div class="box" id="startNightBox">
       <b>Start of Night</b>
       <div class="help" style="margin-top:6px;">
@@ -331,12 +412,17 @@ Red Bull = 4
 
 
     <div class="box">
-      <div class="flex" style="justify-content:space-between">
-        <b>Bars & Stations</b>
-        <button id="addBarBtn" class="btnBlue miniBtn">+ Add Bar</button>
+      <div class="flex" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <b>Groups → Bars → Bartenders</b>
+        <div class="flex" style="gap:8px;">
+          <button id="addGroupBtn"      class="btnTeal miniBtn">+ Add Group</button>
+          <button id="importCsvBarsBtn" class="btnGray miniBtn">⬆️ Import CSV</button>
+          <input  id="csvBarsFile" type="file" accept=".csv,text/csv" style="display:none"/>
+        </div>
       </div>
       <div class="help" style="margin-top:6px;">
-        Add as many bars as you need for that night. Inside each bar, add stations/bartenders as needed.
+        Create groups (e.g. "Theater", "Harbour"), add named bars inside each, then add bartenders.
+        CSV: <span class="kbd">Group,Bar,Station,Bartender,Barback,Placement</span>
       </div>
 
       <div id="barsEditor" class="stGrid" style="margin-top:12px;"></div>
@@ -509,7 +595,7 @@ const DEFAULT_CONFIG = {
   locked: false,
   items: ["Vodka", "Gin", "Tequila", "Whiskey", "Beer", "Red Bull", "Water"],
   sections: [
-    { bar: "B1", stations: [
+    { group: "Group 1", bar: "B1", stations: [
       { station: "Bartender 1", bartender_name: "", barback: "", placement: "P1", bars_label: "" }
     ] }
   ]
@@ -753,9 +839,10 @@ function renderNightPill(){
   el("nightPill").textContent = `Night: ${CONFIG.nightLabel || activeNightId}`;
 }
 function renderSections(){
+  _ensureGroups();
   const wrap = el("sectionTabs");
   wrap.innerHTML = "";
-  for (const sec of CONFIG.sections) {
+  for (const sec of CONFIG.sections.filter(s=>(s.group||"Group 1")===_curGroup)) {
     const b = sec.bar;
     const d = document.createElement("div");
     d.className = "tab" + (b===bar ? " active" : "");
@@ -837,6 +924,14 @@ function renderItems(){
     const buttons = card.querySelectorAll("button");
     buttons[0].onclick = () => applyAction(item, "returned", getQty());
     buttons[1].onclick = () => applyAction(item, "taken", getQty());
+    const _par = getPar(item);
+    if(_par > 0){
+      const _net=(entry.taken||0)-(entry.returned||0);
+      if(_net>_par) card.classList.add("over-par");
+      const _b=document.createElement("span");
+      _b.className="parBadge"; _b.title="Par=expected NET"; _b.textContent="Par:"+_par;
+      const _ne=card.querySelector(".itemName"); if(_ne) _ne.appendChild(_b);
+    }
     wrap.appendChild(card);
   }
 }
@@ -915,6 +1010,7 @@ function renderQuickNames(){
 
 function renderAll(){
   renderNightPill();
+  renderGroups();
   renderSections();
   renderStations();
   renderMeta();
@@ -1173,12 +1269,20 @@ async function switchNight(id){
   CONFIG.items = normalizeItems(CONFIG.items || []);
   if(!store.global) store.global = {pinHash:"", defaultBucketText:""};
   if(typeof store.global.defaultBucketText !== "string") store.global.defaultBucketText = "";
+  // Migrate: ensure group + pars fields
+  if(!CONFIG.pars) CONFIG.pars = {};
+  if(Array.isArray(CONFIG.sections)){
+    const hasAnyGroup = CONFIG.sections.some(s => s.group && s.group.trim());
+    if(!hasAnyGroup) CONFIG.sections.forEach(s => { if(!s.group) s.group = "Group 1"; });
+  }
 
   state = await ensureState();
   log = await loadNightLog(activeNightId);
 
-  bar = CONFIG.sections[0]?.bar || bar;
-  station = CONFIG.sections[0]?.stations?.[0]?.station || station;
+  _curGroup = null;
+  _ensureGroups();
+  bar = (CONFIG.sections.find(s=>s.group===_curGroup)||CONFIG.sections[0])?.bar || bar;
+  station = (CONFIG.sections.find(s=>s.bar===bar)?.stations[0])?.station || station;
 
   renderAll();
   renderSetup();
@@ -1191,6 +1295,7 @@ async function createNight(){
   if(store.nights[name]) return alert("That night already exists. Choose a different name.");
   store.nights[name] = deepClone(DEFAULT_CONFIG);
   store.nights[name].nightLabel = name;
+  if(!store.nights[name].pars) store.nights[name].pars = {};
   store.activeNightId = name;
   await saveStore();
   el("newNightName").value = "";
@@ -1594,6 +1699,7 @@ async function saveSetup(){
   CONFIG.items = normalizeItems(CONFIG.items || []);
   CONFIG.sections = (CONFIG.sections || [])
     .map(sec => ({
+      group: (sec.group||"").trim() || "Group 1",
       bar: (sec.bar||"").trim() || "BAR",
       stations: (sec.stations||[])
         .map(st => ({
@@ -1636,6 +1742,8 @@ function renderSetup(){
     bta.value = store.global.defaultBucketText;
   }
   renderBarsEditor();
+  renderParLevelsList();
+  renderCopyFromSelect();
   updatePinStatus();
 }
 
@@ -1677,8 +1785,20 @@ async function restoreBackupFromFile(file){
   store = obj.store;
   store.global ||= {pinHash:"", defaultBucketText:""};
   if(typeof store.global.defaultBucketText !== "string") store.global.defaultBucketText = "";
-
   store.activeNightId ||= Object.keys(store.nights)[0] || DEFAULT_NIGHT_ID;
+
+  // ── Migrate old backups: back-fill group field ──
+  for(const [nid, cfg] of Object.entries(store.nights)){
+    if(!cfg.sections) cfg.sections = [];
+    // If ALL sections lack group → assign default "Group 1"
+    const hasAnyGroup = cfg.sections.some(s => s.group && s.group.trim());
+    if(!hasAnyGroup){
+      cfg.sections.forEach(s => { if(!s.group) s.group = "Group 1"; });
+    }
+    // Also ensure pars exists
+    if(!cfg.pars) cfg.pars = {};
+  }
+
   await saveStore();
 
   for(const nid of Object.keys(store.nights)){
@@ -1689,9 +1809,10 @@ async function restoreBackupFromFile(file){
     else await deleteNightLog(nid);
   }
 
+  _curGroup = null;
   await switchNight(store.activeNightId);
   closeSetup();
-  toast("Backup restored.");
+  toast("Backup restored successfully.");
 }
 
 /* =========================
@@ -1760,7 +1881,7 @@ el("applyDefaultBucketNowBtn").onclick = async () => {
 };
 
 
-el("addBarBtn").onclick = async ()=>{ const okPin = await requirePin("add bar"); if(!okPin) return; addBar(); renderBarsEditor(); renderQuickNames(); };
+/* addGroupBtn wired in new features block */
 el("saveSetupBtn").onclick = async ()=>{ await saveSetup(); closeSetup(); };
 
 el("setPinBtn").onclick = setOrChangePin;
@@ -1773,6 +1894,417 @@ el("restoreFile").addEventListener("change", async (e)=>{
   e.target.value = "";
   await restoreBackupFromFile(file);
 });
+
+/* =====================================================================
+   NEW FEATURES BLOCK — initialized before Init so overrides are in place
+===================================================================== */
+
+/* ---- Group state (var so it's accessible from patched functions above) ---- */
+var _curGroup = null;
+
+function _allGroups(){
+  const seen=new Set(), out=[];
+  for(const sec of CONFIG.sections||[]){
+    const g=sec.group||"Group 1";
+    if(!seen.has(g)){seen.add(g);out.push(g);}
+  }
+  return out.length?out:["Group 1"];
+}
+function _ensureGroups(){
+  for(const sec of CONFIG.sections||[]) if(!sec.group) sec.group="Group 1";
+  const gs=_allGroups();
+  if(!_curGroup||!gs.includes(_curGroup)) _curGroup=gs[0]||"Group 1";
+}
+function renderGroups(){
+  _ensureGroups();
+  const wrap=el("groupTabs"); if(!wrap)return;
+  wrap.innerHTML="";
+  for(const g of _allGroups()){
+    const d=document.createElement("div");
+    d.className="grouptab"+(g===_curGroup?" active":"");
+    d.textContent=g;
+    d.onclick=()=>{
+      _curGroup=g;
+      const fs=CONFIG.sections.find(s=>s.group===_curGroup);
+      if(fs){bar=fs.bar;station=(fs.stations[0]||{}).station||station;}
+      renderAll();
+    };
+    wrap.appendChild(d);
+  }
+}
+
+/* ---- Par levels ---- */
+function getPar(item){return Number((CONFIG.pars||{})[item])||0;}
+function setPar(item,val){
+  if(!CONFIG.pars)CONFIG.pars={};
+  val=clampInt(val,0,99999);
+  if(val===0)delete CONFIG.pars[item]; else CONFIG.pars[item]=val;
+}
+function renderParLevelsList(){
+  const root=el("parLevelsList"); if(!root)return;
+  root.innerHTML="";
+  for(const item of CONFIG.items||[]){
+    const row=document.createElement("div"); row.className="itemRow";
+    row.innerHTML=`<div class="name">${escapeHtml(item)}</div>
+      <input type="number" min="0" step="1" value="${getPar(item)}" data-par="${escapeHtml(item)}"
+        title="Expected NET (0=off)" style="width:72px;text-align:center;padding:6px 8px;font-size:13px;border-radius:10px;"/>`;
+    root.appendChild(row);
+  }
+  root.querySelectorAll("input[data-par]").forEach(inp=>{
+    inp.oninput=()=>setPar(inp.getAttribute("data-par"),inp.value);
+  });
+}
+
+/* ---- Copy-from ---- */
+function renderCopyFromSelect(){
+  const sel=el("copyFromSelect"); if(!sel)return;
+  sel.innerHTML='<option value="">— pick a night —</option>';
+  for(const [id,cfg] of Object.entries(store.nights)){
+    if(id===activeNightId)continue;
+    const opt=document.createElement("option");
+    opt.value=id; opt.textContent=cfg.nightLabel||id; sel.appendChild(opt);
+  }
+}
+el("copySetupBtn").onclick=async()=>{
+  const srcId=el("copyFromSelect").value;
+  if(!srcId){alert("Select a source night.");return;}
+  const ok=await requirePin("copy setup"); if(!ok)return;
+  const src=store.nights[srcId]; if(!src)return;
+  if(!confirm(`Copy groups, bars & items from "${src.nightLabel||srcId}"?\n\nCounts will NOT change.`))return;
+  CONFIG.sections=deepClone(src.sections||[]);
+  CONFIG.items=deepClone(src.items||[]);
+  CONFIG.pars=deepClone(src.pars||{});
+  store.nights[activeNightId]=CONFIG;
+  await saveStore(); state=await ensureState();
+  _curGroup=null; _ensureGroups();
+  renderAll(); renderSetup();
+  toast("Setup copied from "+(src.nightLabel||srcId)+".");
+};
+
+/* ---- renderBarsEditor override ---- */
+renderBarsEditor = function(){
+  _ensureGroups();
+  const root=el("barsEditor"); root.innerHTML="";
+  for(const grp of _allGroups()){
+    const secsInGrp=CONFIG.sections.filter(s=>(s.group||"Group 1")===grp);
+    const grpWrap=document.createElement("div"); grpWrap.className="groupCard";
+    const grpHead=document.createElement("div"); grpHead.className="groupCardHead";
+    grpHead.innerHTML=`
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="badge">🏢 Group</span>
+        <input class="grpNameInp" data-old="${escapeHtml(grp)}" value="${escapeHtml(grp)}"
+          placeholder="Group name" style="min-width:150px;font-weight:800;font-size:13px;"/>
+      </div>
+      <div class="rightFlex" style="gap:8px;">
+        <button class="btnBlue miniBtn" data-act="addBar" data-grp="${escapeHtml(grp)}">+ Add Bar</button>
+        <button class="btnRed  miniBtn" data-act="rmGrp"  data-grp="${escapeHtml(grp)}">Remove Group</button>
+      </div>`;
+    grpWrap.appendChild(grpHead);
+    grpHead.querySelector(".grpNameInp").oninput=function(){
+      const oldG=this.getAttribute("data-old"),newG=this.value||"Group";
+      for(const sec of CONFIG.sections) if(sec.group===oldG) sec.group=newG;
+      if(_curGroup===oldG)_curGroup=newG;
+      this.setAttribute("data-old",newG);
+      renderGroups(); renderQuickNames();
+    };
+    const barsWrap=document.createElement("div"); barsWrap.className="stGrid";
+    secsInGrp.forEach(sec=>{
+      const si=CONFIG.sections.indexOf(sec);
+      const bc=document.createElement("div"); bc.className="stCard";
+      const bh=document.createElement("div"); bh.className="flex"; bh.style.justifyContent="space-between";
+      bh.innerHTML=`
+        <div class="flex" style="gap:6px;">
+          <span class="badge">🍺 Bar</span>
+          <input data-k="bar" data-sec="${si}" value="${escapeHtml(sec.bar)}"
+            style="min-width:130px;" placeholder="Bar name"/>
+        </div>
+        <div class="rightFlex" style="gap:6px;">
+          <button class="btnBlue miniBtn" data-act="addSt" data-sec="${si}">+ Bartender</button>
+          <button class="btnRed  miniBtn" data-act="rmBar" data-sec="${si}">Remove Bar</button>
+        </div>`;
+      bc.appendChild(bh);
+      const sw=document.createElement("div"); sw.className="stGrid"; sw.style.marginTop="10px";
+      sec.stations.forEach((st,sti)=>{
+        const c=document.createElement("div"); c.className="stCard";
+        c.innerHTML=`<h3>Bartender ${sti+1}</h3>
+          <div class="fields">
+            <div><label>Station label</label>
+              <input data-k="station" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.station||"")}" placeholder="Bartender 1"/></div>
+            <div><label>Bartender name</label>
+              <input data-k="bartender_name" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.bartender_name||"")}" placeholder="(optional)"/></div>
+            <div><label>Barback</label>
+              <input data-k="barback" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.barback||"")}" placeholder="(optional)"/></div>
+            <div><label>Placement</label>
+              <input data-k="placement" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.placement||"")}" placeholder="P1"/></div>
+            <div style="grid-column:1/-1"><label>Bars label (blank=auto)</label>
+              <input data-k="bars_label" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.bars_label||"")}" placeholder="Auto: Bar/Station"/></div>
+          </div>
+          <div class="rightFlex" style="margin-top:8px;">
+            <button class="btnRed miniBtn" data-act="rmSt" data-sec="${si}" data-st="${sti}">Remove</button>
+          </div>`;
+        sw.appendChild(c);
+      });
+      bc.appendChild(sw); barsWrap.appendChild(bc);
+    });
+    grpWrap.appendChild(barsWrap); root.appendChild(grpWrap);
+  }
+  root.querySelectorAll("input[data-k]").forEach(inp=>{
+    inp.oninput=()=>{
+      const k=inp.getAttribute("data-k"),si=+inp.getAttribute("data-sec"),sti=inp.getAttribute("data-st");
+      if(sti===null)CONFIG.sections[si][k]=inp.value;
+      else CONFIG.sections[si].stations[+sti][k]=inp.value;
+      renderQuickNames();
+    };
+  });
+  root.querySelectorAll("button[data-act]").forEach(btn=>{
+    btn.onclick=async()=>{
+      const ok=await requirePin("edit structure"); if(!ok)return;
+      const act=btn.getAttribute("data-act"),grp=btn.getAttribute("data-grp");
+      const si=btn.getAttribute("data-sec")!=null?+btn.getAttribute("data-sec"):null;
+      const sti=btn.getAttribute("data-st")!=null?+btn.getAttribute("data-st"):null;
+      if(act==="addBar"){
+        const n=CONFIG.sections.filter(s=>s.group===grp).length+1;
+        const last=CONFIG.sections.reduce((a,s,i)=>s.group===grp?i:a,-1);
+        const ns={group:grp,bar:`Bar ${n}`,stations:[{station:"Bartender 1",bartender_name:"",barback:"",placement:"P1",bars_label:""}]};
+        if(last>=0)CONFIG.sections.splice(last+1,0,ns); else CONFIG.sections.push(ns);
+      }else if(act==="rmGrp"){
+        const inG=CONFIG.sections.filter(s=>s.group===grp);
+        if(CONFIG.sections.length<=inG.length){alert("Keep at least one bar total.");return;}
+        if(!confirm(`Remove group "${grp}" and all its bars?`))return;
+        CONFIG.sections=CONFIG.sections.filter(s=>s.group!==grp);
+        if(_curGroup===grp){_curGroup=null;_ensureGroups();}
+      }else if(act==="addSt"){
+        const n=CONFIG.sections[si].stations.length+1;
+        CONFIG.sections[si].stations.push({station:`Bartender ${n}`,bartender_name:"",barback:"",placement:`P${n}`,bars_label:""});
+      }else if(act==="rmBar"){
+        if(CONFIG.sections.length<=1){alert("Keep at least one bar.");return;}
+        CONFIG.sections.splice(si,1);
+      }else if(act==="rmSt"){
+        if(CONFIG.sections[si].stations.length<=1){alert("Keep at least one bartender per bar.");return;}
+        CONFIG.sections[si].stations.splice(sti,1);
+      }
+      renderBarsEditor(); renderQuickNames();
+    };
+  });
+};
+
+el("addGroupBtn").onclick=async()=>{
+  const ok=await requirePin("add group"); if(!ok)return;
+  const n=_allGroups().length+1;
+  CONFIG.sections.push({group:`Group ${n}`,bar:"Bar 1",
+    stations:[{station:"Bartender 1",bartender_name:"",barback:"",placement:"P1",bars_label:""}]});
+  renderBarsEditor(); renderQuickNames();
+};
+
+el("importCsvBarsBtn").onclick=()=>el("csvBarsFile").click();
+el("csvBarsFile").addEventListener("change",async e=>{
+  const file=e.target.files&&e.target.files[0]; e.target.value=""; if(!file)return;
+  const ok=await requirePin("import CSV"); if(!ok)return;
+  const text=await file.text();
+  const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  if(lines.length<2){alert("Need header + at least one data row.");return;}
+  const hdr=lines[0].split(",").map(h=>h.replace(/^"|"$/g,"").trim().toLowerCase());
+  const gi=hdr.findIndex(h=>h.includes("group")),bi=hdr.findIndex(h=>h.includes("bar")),si=hdr.findIndex(h=>h.includes("station"));
+  const bti=hdr.findIndex(h=>h.includes("bartender")||h==="name"),bbi=hdr.findIndex(h=>h.includes("barback")),pi=hdr.findIndex(h=>h.includes("placement"));
+  if(bi<0||si<0){alert("CSV must have 'Bar' and 'Station' columns.");return;}
+  const secMap={};
+  for(const line of lines.slice(1)){
+    const cols=line.split(",").map(c=>c.replace(/^"|"$/g,"").trim());
+    const grp=gi>=0?(cols[gi]||"Group 1"):"Group 1",bName=cols[bi]||"Bar 1",stName=cols[si]||"Station";
+    const key=grp+"|||"+bName;
+    if(!secMap[key])secMap[key]={group:grp,bar:bName,stations:[]};
+    secMap[key].stations.push({station:stName,bartender_name:bti>=0?cols[bti]:"",barback:bbi>=0?cols[bbi]:"",placement:pi>=0?cols[pi]:"",bars_label:""});
+  }
+  const sections=Object.values(secMap);
+  if(!sections.length){alert("No valid rows.");return;}
+  if(!confirm(`Import ${sections.length} bar(s) from CSV? Replaces current bars.`))return;
+  CONFIG.sections=sections;_curGroup=null;_ensureGroups();
+  renderBarsEditor();renderQuickNames();toast(`Imported ${sections.length} bars.`);
+});
+
+/* ---- Bar Summary ---- */
+function exportBarSummary(){
+  const nt=CONFIG.nightLabel||activeNightId;
+  const css=`:root{--bg:#0b1220;--card:#111a2e;--line:#203056;--muted:#a9b6d6;--text:#e8eefc}*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);padding:16px}.pBtn{border-radius:12px;border:1px solid #2a3d6b;background:#1a3cff;color:#fff;padding:10px 14px;font-weight:700;cursor:pointer;margin-bottom:14px}.grpT{font-size:18px;font-weight:900;margin:16px 0 4px;color:#9fd3ff}.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:8px 0}.barT{font-size:15px;font-weight:800}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{border-bottom:1px solid #22325b;padding:8px 6px;text-align:left}th{color:var(--muted);font-weight:600}.r{text-align:right}@media print{body{background:#fff;color:#000}.sec{background:#fff;border-color:#ccc}.pBtn{display:none}}`;
+  let body="";
+  for(const grp of _allGroups()){
+    body+=`<div class="grpT">🏢 ${escapeHtml(grp)}</div>`;
+    for(const sec of CONFIG.sections.filter(s=>(s.group||"Group 1")===grp)){
+      let tT=0,tR=0;
+      const rows=CONFIG.items.map(item=>{let t=0,r=0;for(const st of sec.stations){const e=state?.[sec.bar]?.[st.station]?.[item]||{};t+=(e.taken||0);r+=(e.returned||0);}tT+=t;tR+=r;return{item,t,r,n:t-r};}).sort((a,b)=>Math.abs(b.n)-Math.abs(a.n));
+      body+=`<div class="sec"><div class="barT">🍺 ${escapeHtml(sec.bar)}</div><div style="font-size:12px;color:var(--muted)">All bartenders combined — Taken:${tT} Returned:${tR} Net:${tT-tR}</div><table><thead><tr><th>Item</th><th class="r">Taken</th><th class="r">Returned</th><th class="r">Net</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${escapeHtml(r.item)}</td><td class="r"><b>${r.t}</b></td><td class="r"><b>${r.r}</b></td><td class="r"><b>${r.n}</b></td></tr>`).join("")}</tbody></table></div>`;
+    }
+  }
+  downloadText(`bar_summary_${safeFilePart(nt)}.html`,`<!doctype html><html><head><meta charset="utf-8"/><title>Bar Summary</title><style>${css}</style></head><body><button class="pBtn" onclick="window.print()">🖨️ Print / Save PDF</button><h1>📊 Bar Summary</h1><div style="color:var(--muted);font-size:12px;margin-bottom:14px">Night: <b>${escapeHtml(nt)}</b></div>${body}</body></html>`,"text/html;charset=utf-8");
+}
+el("exportBarSummaryBtn").onclick=exportBarSummary;
+
+/* ---- Variance Report ---- */
+function exportVarianceReport(){
+  const nt=CONFIG.nightLabel||activeNightId;
+  if(!Object.keys(CONFIG.pars||{}).length&&!confirm("No par levels set. Export anyway?"))return;
+  const css=`:root{--bg:#0b1220;--card:#111a2e;--line:#203056;--muted:#a9b6d6;--text:#e8eefc;--red:#ff2d55;--green:#26d07c}*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);padding:16px}.pBtn{border-radius:12px;border:1px solid #2a3d6b;background:#1a3cff;color:#fff;padding:10px 14px;font-weight:700;cursor:pointer;margin-bottom:14px}.grpT{font-size:18px;font-weight:900;margin:16px 0 4px;color:#9fd3ff}.barT{font-size:15px;font-weight:800;margin:10px 0 4px}.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:6px 0}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{border-bottom:1px solid #22325b;padding:8px 6px;text-align:left}th{color:var(--muted);font-weight:600}.r{text-align:right}.vP{color:var(--green);font-weight:700}.vN{color:var(--red);font-weight:700}.vZ{color:var(--muted)}@media print{body{background:#fff;color:#000}.sec{background:#fff;border-color:#ccc}.pBtn{display:none}}`;
+  let body="";
+  for(const grp of _allGroups()){
+    body+=`<div class="grpT">🏢 ${escapeHtml(grp)}</div>`;
+    for(const sec of CONFIG.sections.filter(s=>(s.group||"Group 1")===grp)){
+      body+=`<div class="barT">🍺 ${escapeHtml(sec.bar)}</div>`;
+      for(const st of sec.stations){
+        let tT=0,tR=0;
+        const rows=CONFIG.items.map(item=>{const e=state?.[sec.bar]?.[st.station]?.[item]||{taken:0,returned:0};const t=e.taken||0,r=e.returned||0,n=t-r,par=getPar(item);tT+=t;tR+=r;return{item,t,r,n,par,v:par>0?n-par:null};}).sort((a,b)=>Math.abs(b.n)-Math.abs(a.n));
+        body+=`<div class="sec"><div style="font-weight:700;font-size:13px">${escapeHtml(st.bartender_name||st.station)}</div><div style="font-size:12px;color:var(--muted)">Taken:${tT} Ret:${tR} Net:${tT-tR}</div><table><thead><tr><th>Item</th><th class="r">Par</th><th class="r">Taken</th><th class="r">Ret.</th><th class="r">Net</th><th class="r">Variance</th></tr></thead><tbody>${rows.map(row=>{const vc=row.v===null?"vZ":row.v>0?"vP":row.v<0?"vN":"vZ";const vs=row.v===null?"N/A":row.v>0?"+"+row.v:String(row.v);return`<tr><td>${escapeHtml(row.item)}</td><td class="r">${row.par||"—"}</td><td class="r"><b>${row.t}</b></td><td class="r"><b>${row.r}</b></td><td class="r"><b>${row.n}</b></td><td class="r ${vc}"><b>${vs}</b></td></tr>`;}).join("")}</tbody></table></div>`;
+      }
+    }
+  }
+  downloadText(`variance_${safeFilePart(nt)}.html`,`<!doctype html><html><head><meta charset="utf-8"/><title>Variance</title><style>${css}</style></head><body><button class="pBtn" onclick="window.print()">🖨️ Print / Save PDF</button><h1>📈 Variance Report</h1><div style="color:var(--muted);font-size:12px;margin-bottom:14px">Night: <b>${escapeHtml(nt)}</b> · Par = expected NET</div>${body}</body></html>`,"text/html;charset=utf-8");
+}
+el("exportVarianceBtn").onclick=exportVarianceReport;
+
+/* ---- All Nights CSV ---- */
+async function exportAllNightsTotals(){
+  const ok=await requirePin("export all nights"); if(!ok)return;
+  const allItems=new Set();
+  for(const cfg of Object.values(store.nights))(cfg.items||[]).forEach(i=>allItems.add(i));
+  const items=[...allItems].sort();
+  const hdr=["Night","Group","Bar","Station",...items.flatMap(i=>[i+" Taken",i+" Ret",i+" Net"])];
+  const lines=[hdr.map(csvCell).join(",")];
+  for(const [nid,cfg] of Object.entries(store.nights)){
+    const st=await loadNightState(nid);
+    for(const sec of cfg.sections||[])for(const stn of sec.stations||[]){
+      const row=[csvCell(cfg.nightLabel||nid),csvCell(sec.group||""),csvCell(sec.bar),csvCell(stn.bartender_name||stn.station)];
+      for(const item of items){const e=(st[sec.bar]||{})[stn.station]||{};const t=(e[item]||{}).taken||0,r=(e[item]||{}).returned||0;row.push(csvCell(t),csvCell(r),csvCell(t-r));}
+      lines.push(row.join(","));
+    }
+  }
+  downloadText(`all_nights_${safeFilePart(new Date().toLocaleDateString())}.csv`,lines.join("\n"),"text/csv;charset=utf-8");
+}
+el("exportAllNightsBtn").onclick=exportAllNightsTotals;
+
+/* ---- Compare ---- */
+function _mShow(id){el(id).style.display="flex";}
+function _mHide(id){el(id).style.display="none";}
+el("compareBtn").onclick=()=>{
+  const ids=Object.keys(store.nights);
+  const opts=ids.map(id=>`<option value="${escapeHtml(id)}">${escapeHtml(store.nights[id]?.nightLabel||id)}</option>`).join("");
+  el("compareSelA").innerHTML=opts; el("compareSelB").innerHTML=opts;
+  if(ids.length>=2){el("compareSelA").value=ids[0];el("compareSelB").value=ids[1];}
+  el("compareResult").innerHTML="";
+  _mShow("compareBackdrop");
+};
+el("closeCompareBtn").onclick=()=>_mHide("compareBackdrop");
+el("compareBackdrop").addEventListener("click",e=>{if(e.target===el("compareBackdrop"))_mHide("compareBackdrop");});
+el("runCompareBtn").onclick=async()=>{
+  const idA=el("compareSelA").value,idB=el("compareSelB").value; if(!idA||!idB)return;
+  const cfgA=store.nights[idA]||{},cfgB=store.nights[idB]||{};
+  const stA=await loadNightState(idA),stB=await loadNightState(idB);
+  const allItems=new Set([...(cfgA.items||[]),...(cfgB.items||[])]);
+  function agg(cfg,st){const o={};for(const item of allItems){let t=0,r=0;for(const sec of cfg.sections||[])for(const stn of sec.stations||[]){const e=(st[sec.bar]||{})[stn.station]||{};t+=(e[item]||{}).taken||0;r+=(e[item]||{}).returned||0;}o[item]={t,r,n:t-r};}return o;}
+  const aggA=agg(cfgA,stA),aggB=agg(cfgB,stB);
+  let rows="";
+  for(const item of allItems){const a=aggA[item]||{t:0,r:0,n:0},b=aggB[item]||{t:0,r:0,n:0},d=b.n-a.n;const col=d>0?"#26d07c":d<0?"#ff2d55":"var(--muted)";rows+=`<tr><td>${escapeHtml(item)}</td><td class="right"><b>${a.n}</b><span class="muted"> (T${a.t} R${a.r})</span></td><td class="right"><b>${b.n}</b><span class="muted"> (T${b.t} R${b.r})</span></td><td class="right" style="color:${col};font-weight:800">${d>=0?"+":""}${d}</td></tr>`;}
+  el("compareResult").innerHTML=`<div style="overflow-x:auto"><table><thead><tr><th>Item</th><th class="right">${escapeHtml(cfgA.nightLabel||idA)}</th><th class="right">${escapeHtml(cfgB.nightLabel||idB)}</th><th class="right">Diff</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+};
+
+/* ---- History ---- */
+el("historyBtn").onclick=async()=>{
+  const root=el("archiveCards"); root.innerHTML=""; el("archiveDetail").innerHTML="";
+  for(const [id,cfg] of Object.entries(store.nights)){
+    const st=await loadNightState(id);
+    let tT=0,tR=0;
+    for(const sec of cfg.sections||[])for(const stn of sec.stations||[])for(const item of cfg.items||[]){const e=(st[sec.bar]||{})[stn.station]||{};tT+=(e[item]||{}).taken||0;tR+=(e[item]||{}).returned||0;}
+    const grps=[...new Set((cfg.sections||[]).map(s=>s.group||"").filter(Boolean))].join(", ")||"—";
+    const card=document.createElement("div"); card.className="archCard";
+    card.innerHTML=`<div style="font-weight:800;font-size:14px">${escapeHtml(cfg.nightLabel||id)}</div>
+      <div style="color:var(--muted);font-size:12px;margin-top:4px">Groups: ${escapeHtml(grps)}</div>
+      <div style="color:var(--muted);font-size:12px">${(cfg.sections||[]).length} bars · ${(cfg.sections||[]).reduce((a,s)=>a+(s.stations||[]).length,0)} stations</div>
+      <div style="color:var(--muted);font-size:12px">Taken:${tT} · Ret:${tR} · Net:${tT-tR}</div>`;
+    card.onclick=async()=>{
+      const c2=store.nights[id]||{},s2=await loadNightState(id);
+      let html=`<div class="box"><b style="font-size:14px">${escapeHtml(c2.nightLabel||id)}</b>`;
+      for(const grp of [...new Set((c2.sections||[]).map(s=>s.group||"—"))]){
+        html+=`<div style="font-weight:900;font-size:13px;color:#9fd3ff;margin-top:12px">🏢 ${escapeHtml(grp)}</div>`;
+        for(const sec of (c2.sections||[]).filter(s=>(s.group||"—")===grp)){
+          html+=`<div style="font-weight:700;font-size:12px;color:var(--muted);margin-top:8px">🍺 ${escapeHtml(sec.bar)}</div><div class="log" style="max-height:160px;margin-top:4px"><table><thead><tr><th>Bartender</th>`;
+          for(const item of c2.items||[]) html+=`<th class="right">${escapeHtml(item)}</th>`;
+          html+=`</tr></thead><tbody>`;
+          for(const stn of sec.stations||[]){
+            html+=`<tr><td style="font-weight:700">${escapeHtml(stn.bartender_name||stn.station)}</td>`;
+            for(const item of c2.items||[]){const e=(s2[sec.bar]||{})[stn.station]||{};const n=((e[item]||{}).taken||0)-((e[item]||{}).returned||0);const col=n>0?"#26d07c":n<0?"#ff2d55":"var(--muted)";html+=`<td class="right" style="color:${col}">${n}</td>`;}
+            html+=`</tr>`;
+          }
+          html+=`</tbody></table></div>`;
+        }
+      }
+      html+=`</div>`;
+      el("archiveDetail").innerHTML=html;
+      el("archiveDetail").scrollIntoView({behavior:"smooth",block:"nearest"});
+    };
+    root.appendChild(card);
+  }
+  _mShow("historyBackdrop");
+};
+el("closeHistoryBtn").onclick=()=>_mHide("historyBackdrop");
+el("historyBackdrop").addEventListener("click",e=>{if(e.target===el("historyBackdrop"))_mHide("historyBackdrop");});
+
+/* ---- Bulk Apply ---- */
+el("bulkApplyBtn").onclick=()=>{
+  if(isLocked())return;
+  const iSel=el("bulkItem"); iSel.innerHTML="";
+  (CONFIG.items||[]).forEach(item=>iSel.appendChild(new Option(item,item)));
+  const root=el("bulkStationList"); root.innerHTML="";
+  for(const grp of _allGroups()){
+    const lbl=document.createElement("div");lbl.style.cssText="font-weight:800;font-size:12px;color:#9fd3ff;padding:6px 0 2px;";lbl.textContent="🏢 "+grp;root.appendChild(lbl);
+    for(const sec of CONFIG.sections.filter(s=>(s.group||"Group 1")===grp)){
+      for(const st of sec.stations||[]){
+        const row=document.createElement("div"); row.className="stCheck";
+        const cb=document.createElement("input"); cb.type="checkbox"; cb.value=sec.bar+"|||"+st.station;
+        if(sec.bar===bar&&st.station===station)cb.checked=true;
+        const l2=document.createElement("span"); l2.textContent="🍺 "+sec.bar+" / "+(st.bartender_name||st.station);
+        row.appendChild(cb); row.appendChild(l2);
+        row.onclick=e=>{if(e.target!==cb)cb.checked=!cb.checked;};
+        root.appendChild(row);
+      }
+    }
+  }
+  _mShow("bulkBackdrop");
+};
+async function _execBulk(action){
+  if(isLocked())return;
+  const ok=await requirePin("bulk apply"); if(!ok)return;
+  const item=el("bulkItem").value,qty=clampInt(el("bulkQty").value,1,9999);
+  const checked=[...el("bulkStationList").querySelectorAll("input:checked")].map(cb=>cb.value);
+  if(!checked.length){alert("Select at least one station.");return;}
+  if(!confirm(`Apply ${action==="taken"?"+ taken":"− returned"} ×${qty} "${item}" to ${checked.length} station(s)?`))return;
+  for(const key of checked){const [b,s]=key.split("|||");state[b]??={};state[b][s]??={};state[b][s][item]??={taken:0,returned:0};if(action==="taken")state[b][s][item].taken+=qty;else state[b][s][item].returned+=qty;log.push({ts:new Date().toISOString(),bar:b,station:s,item,action,qty,note:"bulk"});}
+  await saveNightState(activeNightId,state); await saveNightLog(activeNightId,log);
+  renderAll(); _mHide("bulkBackdrop"); toast(`Bulk ${action} ×${qty} → ${checked.length} station(s).`);
+}
+el("closeBulkBtn").onclick=()=>_mHide("bulkBackdrop");
+el("bulkBackdrop").addEventListener("click",e=>{if(e.target===el("bulkBackdrop"))_mHide("bulkBackdrop");});
+el("bulkSelectAll").onclick=()=>el("bulkStationList").querySelectorAll("input").forEach(c=>c.checked=true);
+el("bulkDeselectAll").onclick=()=>el("bulkStationList").querySelectorAll("input").forEach(c=>c.checked=false);
+el("bulkTakenBtn").onclick=()=>_execBulk("taken");
+el("bulkRetBtn").onclick=()=>_execBulk("returned");
+
+/* ---- Keyboard nav ---- */
+var _kbItem=null;
+document.addEventListener("keydown",e=>{
+  const tag=(e.target?.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea"||tag==="select")return;
+  if(isLocked())return;
+  const wrap=el("items"); if(!wrap)return;
+  const cards=[...wrap.querySelectorAll(".itemCard")]; if(!cards.length)return;
+  const gN=c=>{const n=c.querySelector(".itemName");return n?.childNodes[0]?.textContent?.trim()||n?.textContent.trim();};
+  const cur=_kbItem?cards.findIndex(c=>gN(c)===_kbItem):-1;
+  if(e.key==="ArrowDown"||e.key==="ArrowRight"){e.preventDefault();const nx=cards[Math.min(cur+1,cards.length-1)];if(nx){_kbItem=gN(nx);_kbHL(cards);}}
+  else if(e.key==="ArrowUp"||e.key==="ArrowLeft"){e.preventDefault();const pv=cards[Math.max(0,cur-1)];if(pv){_kbItem=gN(pv);_kbHL(cards);}}
+  else if((e.key==="+"||e.key==="=")&&_kbItem){e.preventDefault();applyAction(_kbItem,"taken",getQty());}
+  else if(e.key==="-"&&_kbItem){e.preventDefault();applyAction(_kbItem,"returned",getQty());}
+  else if(/^[1-9]$/.test(e.key)){const q=el("qty");if(q)q.value=e.key;}
+  // ESC closes extra modals
+  if(e.key==="Escape"){for(const id of ["compareBackdrop","historyBackdrop","bulkBackdrop"]){const bd=el(id);if(bd&&bd.style.display==="flex"){_mHide(id);return;}}}
+});
+function _kbHL(cards){const gN=c=>{const n=c.querySelector(".itemName");return n?.childNodes[0]?.textContent?.trim()||n?.textContent.trim();};cards.forEach(c=>{c.style.outline=gN(c)===_kbItem?"2px solid var(--blue)":"";});}
 
 /* =========================
    Init
@@ -1789,6 +2321,15 @@ store = await loadStore();
 store.global ||= {pinHash:"", defaultBucketText:""};
 if(typeof store.global.defaultBucketText !== "string") store.global.defaultBucketText = "";
 
+// ── Migrate existing data: ensure group field on all sections ──
+for(const cfg of Object.values(store.nights||{})){
+  if(!cfg.pars) cfg.pars = {};
+  if(Array.isArray(cfg.sections)){
+    const hasAnyGroup = cfg.sections.some(s => s.group && s.group.trim());
+    if(!hasAnyGroup) cfg.sections.forEach(s => { if(!s.group) s.group = "Group 1"; });
+  }
+}
+
 activeNightId = nightKey(store.activeNightId);
 if(!store.nights[activeNightId]) activeNightId = Object.keys(store.nights)[0] || DEFAULT_NIGHT_ID;
 CONFIG = store.nights[activeNightId] || deepClone(DEFAULT_CONFIG);
@@ -1798,12 +2339,16 @@ CONFIG.items = normalizeItems(CONFIG.items || []);
 state = await ensureState();
 log = await loadNightLog(activeNightId);
 
-bar = CONFIG.sections[0]?.bar || "B1";
-station = CONFIG.sections[0]?.stations?.[0]?.station || "Bartender 1";
+_curGroup = null;
+_ensureGroups();
+bar = (CONFIG.sections.find(s=>s.group===_curGroup)||CONFIG.sections[0])?.bar || "B1";
+station = (CONFIG.sections.find(s=>s.bar===bar)?.stations[0])?.station || "Bartender 1";
 
 renderAll();
 updatePinStatus();
 renderSetup();
+
+
 
 })();</script>
 </body>
