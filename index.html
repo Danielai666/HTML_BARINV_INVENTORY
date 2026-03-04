@@ -164,6 +164,23 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
 .bc-scanLine{width:min(400px,95vw);height:3px;background:linear-gradient(90deg,transparent,#1a3cff,transparent);
   animation:scanMove 1.5s linear infinite;}
 @keyframes scanMove{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+/* ── NAVIGATOR (accordion) ── */
+.navGroup{border:1px solid #22325b;border-radius:14px;background:#0d1630;overflow:hidden;}
+.navHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;}
+.navHead:hover{border-color:#3352aa}
+.navTitle{font-weight:900;font-size:14px;}
+.navSub{color:var(--muted);font-size:12px;}
+.navChevron{color:var(--muted);font-weight:900;}
+.navBody{display:none;padding:0 12px 12px 12px;}
+.navRow{display:flex;justify-content:space-between;gap:10px;align-items:center;
+  border:1px solid #22325b;border-radius:12px;background:#0b1220;padding:10px 12px;margin-top:8px;
+  cursor:pointer;user-select:none;}
+.navRow:hover{border-color:#3352aa}
+.navRow .left{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.navRow .top{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.navRow .bot{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.navRow .pill{font-size:11px;border-radius:999px;border:1px solid #22325b;background:#0d1630;padding:4px 10px;color:var(--muted);}
+.navRow.active{border-color:#3b64d6;box-shadow:0 0 0 2px rgba(59,100,214,.15) inset;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.21.2/umd/index.min.js"></script>
 </head>
@@ -203,14 +220,29 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
         </div>
       </div>
 
-      <label>Groups</label>
-      <div class="tabs" id="groupTabs" style="gap:6px;"></div>
+            <label>Navigator</label>
+      <div class="flex" style="gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+        <select id="navMode" style="min-width:190px;">
+          <option value="bar">Group: Bar</option>
+          <option value="bartender">Group: Bartender</option>
+          <option value="barback">Group: Barback</option>
+          <option value="placement">Group: Placement</option>
+          <option value="group">Group: Group</option>
+        </select>
+        <input id="navSearch" placeholder="Find bar / bartender / barback / placement…" style="flex:1;min-width:220px;" />
+      </div>
+      <div id="navList" class="stGrid" style="grid-template-columns:1fr;gap:10px;"></div>
 
-      <label>Bars</label>
-      <div class="tabs" id="sectionTabs" style="gap:6px;"></div>
+      <div style="display:none">
+        <label>Groups</label>
+        <div class="tabs" id="groupTabs" style="gap:6px;"></div>
 
-      <label>Stations (Bartenders)</label>
-      <div class="subtabs" id="stationTabs"></div>
+        <label>Bars</label>
+        <div class="tabs" id="sectionTabs" style="gap:6px;"></div>
+
+        <label>Stations (Bartenders)</label>
+        <div class="subtabs" id="stationTabs"></div>
+      </div>
 
       <div id="stationMeta" class="stationMeta"></div>
 
@@ -1049,6 +1081,177 @@ function renderStations(){
     wrap.appendChild(empty);
   }
 }
+/* =========================
+   Navigator (accordion)
+========================= */
+const NAV_MODE_KEY = "invClicker_navMode_v1";
+const NAV_EXP_KEY  = "invClicker_navExpanded_v1";
+let navExpanded = new Set();
+function navLoadPrefs(){
+  try{
+    const mode = localStorage.getItem(NAV_MODE_KEY);
+    if(mode && el("navMode")) el("navMode").value = mode;
+    const expRaw = localStorage.getItem(NAV_EXP_KEY);
+    if(expRaw){
+      const arr = JSON.parse(expRaw);
+      if(Array.isArray(arr)) navExpanded = new Set(arr);
+    }
+  }catch(e){}
+}
+function navSavePrefs(){
+  try{
+    if(el("navMode")) localStorage.setItem(NAV_MODE_KEY, el("navMode").value);
+    localStorage.setItem(NAV_EXP_KEY, JSON.stringify([...navExpanded].slice(0,200)));
+  }catch(e){}
+}
+function navKey(mode, groupName){ return `${mode}||${groupName}`; }
+
+function navStationLabel(sec, st){
+  const bt = (st.bartender_name||"").trim();
+  const bb = (st.barback||"").trim();
+  const pl = (st.placement||"").trim();
+  const g  = (sec.group||"Group 1").trim();
+  const parts = [];
+  if(g) parts.push("Group: "+g);
+  if(bb) parts.push("Barback: "+bb);
+  if(pl) parts.push("Placement: "+pl);
+  return parts.join(" • ");
+}
+
+function navCollect(mode, search){
+  const q = (search||"").trim().toLowerCase();
+  const groups = new Map(); // groupName -> array of {sec, st, title, sub, pills[]}
+  const add = (groupName, sec, st, title, sub, pills=[])=>{
+    const hay = `${groupName} ${sec.group||""} ${sec.bar||""} ${st.station||""} ${st.bartender_name||""} ${st.barback||""} ${st.placement||""}`.toLowerCase();
+    if(q && !hay.includes(q)) return;
+    if(!groups.has(groupName)) groups.set(groupName, []);
+    groups.get(groupName).push({sec, st, title, sub, pills});
+  };
+
+  for(const sec of (CONFIG.sections||[])){
+    for(const st of (sec.stations||[])){
+      const barName = sec.bar;
+      const stLabel = st.station;
+      const bt = (st.bartender_name||stLabel||"").trim() || stLabel || "Station";
+      const bb = (st.barback||"").trim() || "—";
+      const pl = (st.placement||"").trim() || "—";
+      const grp = (sec.group||"Group 1").trim() || "Group 1";
+
+      if(mode==="bar"){
+        add(barName, sec, st, bt, navStationLabel(sec, st), [
+          `Bar: ${barName}`, `Station: ${stLabel}`
+        ]);
+      }else if(mode==="bartender"){
+        add(bt, sec, st, `${barName} / ${stLabel}`, navStationLabel(sec, st), [
+          `Bartender: ${bt}`
+        ]);
+      }else if(mode==="barback"){
+        add(bb, sec, st, `${barName} / ${bt}`, `Station: ${stLabel} • Group: ${grp} • Placement: ${pl}`, [
+          `Barback: ${bb}`
+        ]);
+      }else if(mode==="placement"){
+        add(pl, sec, st, `${barName} / ${bt}`, `Station: ${stLabel} • Group: ${grp} • Barback: ${bb}`, [
+          `Placement: ${pl}`
+        ]);
+      }else{ // group
+        add(grp, sec, st, `${barName} / ${bt}`, `Station: ${stLabel} • Barback: ${bb} • Placement: ${pl}`, [
+          `Group: ${grp}`
+        ]);
+      }
+    }
+  }
+
+  // sort groups alphabetically, items alphabetically by title
+  const out = [...groups.entries()].map(([name, arr])=>{
+    arr.sort((a,b)=> a.title.localeCompare(b.title));
+    return [name, arr];
+  });
+  out.sort((a,b)=> a[0].localeCompare(b[0]));
+  return out;
+}
+
+function renderNavigator(){
+  const listEl = el("navList");
+  const modeEl = el("navMode");
+  const searchEl = el("navSearch");
+  if(!listEl || !modeEl || !searchEl) return;
+
+  const mode = modeEl.value || "bar";
+  const groups = navCollect(mode, searchEl.value);
+
+  listEl.innerHTML = "";
+  if(!groups.length){
+    listEl.innerHTML = `<div class="muted small" style="padding:10px 2px;">No matches.</div>`;
+    return;
+  }
+
+  for(const [gName, items] of groups){
+    const gWrap = document.createElement("div");
+    gWrap.className = "navGroup";
+    const k = navKey(mode, gName);
+    const open = navExpanded.has(k);
+
+    const head = document.createElement("div");
+    head.className = "navHead";
+    head.innerHTML = `
+      <div style="min-width:0;">
+        <div class="navTitle">${escapeHtml(gName)}</div>
+        <div class="navSub">${items.length} station${items.length===1?"":"s"}</div>
+      </div>
+      <div class="navChevron">${open ? "▾" : "▸"}</div>
+    `;
+    const body = document.createElement("div");
+    body.className = "navBody";
+    body.style.display = open ? "block" : "none";
+
+    head.onclick = ()=>{
+      const isOpen = body.style.display === "block";
+      body.style.display = isOpen ? "none" : "block";
+      head.querySelector(".navChevron").textContent = isOpen ? "▸" : "▾";
+      if(isOpen) navExpanded.delete(k); else navExpanded.add(k);
+      navSavePrefs();
+    };
+
+    for(const it of items){
+      const row = document.createElement("div");
+      row.className = "navRow" + ((it.sec.bar===bar && it.st.station===station) ? " active" : "");
+      row.innerHTML = `
+        <div class="left">
+          <div class="top">${escapeHtml(it.title)}</div>
+          <div class="bot">${escapeHtml(it.sub)}</div>
+        </div>
+        <div class="pill">Open</div>
+      `;
+      row.onclick = ()=>{
+        // set selection
+        bar = it.sec.bar;
+        station = it.st.station;
+        if(typeof _curGroup !== "undefined"){
+          _curGroup = (it.sec.group||"Group 1");
+        }
+        renderAll();
+      };
+      body.appendChild(row);
+    }
+
+    gWrap.appendChild(head);
+    gWrap.appendChild(body);
+    listEl.appendChild(gWrap);
+  }
+}
+
+function wireNavigator(){
+  const modeEl = el("navMode");
+  const searchEl = el("navSearch");
+  if(modeEl){
+    modeEl.onchange = ()=>{ navSavePrefs(); renderNavigator(); };
+  }
+  if(searchEl){
+    searchEl.oninput = ()=> renderNavigator();
+  }
+  navLoadPrefs();
+}
+
 function renderMeta(){
   const m = getStationMeta(bar, station);
   const wrap = el("stationMeta");
@@ -1191,6 +1394,7 @@ function renderAll(){
   renderItems();
   renderLog();
   renderTotals();
+  renderNavigator();
   updateLockUI();
 }
 
@@ -2522,6 +2726,7 @@ _ensureGroups();
 bar = (CONFIG.sections.find(s=>s.group===_curGroup)||CONFIG.sections[0])?.bar || "B1";
 station = (CONFIG.sections.find(s=>s.bar===bar)?.stations[0])?.station || "Bartender 1";
 
+wireNavigator();
 renderAll();
 updatePinStatus();
 renderSetup();
@@ -3031,6 +3236,49 @@ function bcShowRegisterPopup(code){
   el("bcRegCancel").onclick = ()=>{ popup.style.display="none"; bcSetStatus("Ready"); bcSetInputState(""); el("bcInput")?.focus(); };
 }
 
+/* ---- Camera scanner (ZXing / BarcodeDetector fallback) ---- */
+async function bcStartNativeDetector(){
+  // Uses built-in BarcodeDetector when ZXing CDN is unavailable.
+  if(!("BarcodeDetector" in window)) return false;
+  try{
+    const formats = ["ean_13","ean_8","code_128","code_39","upc_a","upc_e","qr_code"];
+    const detector = new BarcodeDetector({formats});
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio:false });
+    const video = el("bcCamVideo");
+    video.srcObject = stream;
+    await video.play();
+    _bcReader = { stream, detector, stop: ()=>{ stream.getTracks().forEach(t=>t.stop()); } };
+    bcSetStatus("Camera (native) — scanning…");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d", { willReadFrequently:true });
+    const loop = async()=>{
+      if(!_bcCamActive) return;
+      try{
+        if(video.videoWidth && video.videoHeight){
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const bitmap = await createImageBitmap(canvas);
+          const codes = await detector.detect(bitmap);
+          if(codes && codes.length){
+            const val = (codes[0].rawValue||"").trim();
+            if(val){
+              bcHandleScan(val);
+              bcStopCamera();
+              return;
+            }
+          }
+        }
+      }catch(e){}
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
 /* ---- Camera scanner (ZXing) ---- */
 var _bcCamActive = false;
 var _bcReader = null;
@@ -3041,7 +3289,16 @@ el("bcCamBtn").onclick = async()=>{
   _bcCamActive = true;
   try{
     const ZXing = window.ZXing || window.ZXingBrowser;
-    if(!ZXing){ alert("ZXing library not loaded. Check your internet connection."); bcStopCamera(); return; }
+    if(!ZXing){
+      // Fallback to built-in BarcodeDetector (works offline on supported browsers)
+      const okNative = await bcStartNativeDetector();
+      if(!okNative){
+        bcSetStatus("Scanner not available offline. Type barcode or open online once.");
+        toast("Camera scanner needs ZXing (online) or a supported browser BarcodeDetector.");
+        bcStopCamera();
+      }
+      return;
+    }
 
     const hints = new Map();
     const formats = [
