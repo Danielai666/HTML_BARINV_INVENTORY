@@ -104,7 +104,68 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
 .archCard:hover{border-color:#3352aa;}
 .groupCard{border:2px solid #3b64d6;border-radius:14px;padding:14px;background:#0d1630;margin-bottom:12px;}
 .groupCardHead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+
+/* ── WAREHOUSE MODULE CSS ── */
+.wh-wrap{max-width:1200px;margin:0 auto;padding:16px;}
+.wh-catTab{padding:10px 18px;border-radius:999px;border:2px solid #2a3d6b;background:var(--btn);
+  cursor:pointer;user-select:none;font-weight:800;font-size:14px;position:relative;}
+.wh-catTab.active{background:#1a2d62;border-color:#3b64d6;color:#fff;}
+.wh-catTab .wh-lowBadge{position:absolute;top:-4px;right:-4px;background:#ff2d55;
+  color:#fff;font-size:10px;font-weight:900;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;}
+.wh-itemCard{background:#0d1630;border:1px solid #22325b;border-radius:14px;padding:14px;
+  display:flex;flex-direction:column;gap:10px;}
+.wh-itemCard.wh-low{border-color:rgba(255,45,85,.5);}
+.wh-itemCard.wh-ok{border-color:rgba(38,208,124,.25);}
+.wh-stockBox{min-width:80px;text-align:center;background:#0b1220;border:1px solid #22325b;
+  border-radius:12px;padding:8px;}
+.wh-stockNum{font-size:22px;font-weight:900;line-height:1;}
+.wh-stockSub{font-size:11px;color:var(--muted);margin-top:3px;}
+.wh-lowAlert{font-size:11px;color:#ff2d55;font-weight:700;margin-top:2px;}
+.wh-pm{display:flex;gap:8px;width:100%;}
+.wh-pm button{flex:1;font-weight:900;font-size:18px;padding:10px;border-radius:12px;border:1px solid #2a3d6b;}
+.wh-minus{background:#2b1a2a;border-color:#5b2b4c;}
+.wh-plus{background:#132a1f;border-color:#1f6a46;}
+.wh-form{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+.wh-sizePreset{padding:6px 12px;border-radius:999px;border:1px solid #2a3d6b;background:var(--btn);
+  cursor:pointer;font-size:13px;font-weight:700;}
+.wh-sizePreset.active{background:#162652;border-color:#3352aa;}
+.wh-transferLog{max-height:220px;overflow:auto;border:1px solid #22325b;border-radius:12px;margin-top:8px;}
+
+/* ── BARCODE SCANNER CSS ── */
+.bc-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  background:#0d1630;border:1px solid #22325b;border-radius:14px;padding:12px;margin-bottom:14px;}
+.bc-input{flex:1;min-width:160px;font-size:15px;font-weight:700;letter-spacing:2px;
+  background:#0b1220;border:2px solid #2a3d6b;border-radius:10px;padding:10px 14px;}
+.bc-input.bc-active{border-color:#26d07c;box-shadow:0 0 0 3px rgba(38,208,124,.15);}
+.bc-input.bc-found{border-color:#1a3cff;background:rgba(26,60,255,.1);}
+.bc-input.bc-notfound{border-color:#ff2d55;background:rgba(255,45,85,.1);}
+.bc-status{font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;
+  border:1px solid #22325b;background:#0b1220;}
+.bc-status.bc-ok{color:#26d07c;border-color:#26d07c;}
+.bc-status.bc-err{color:#ff2d55;border-color:#ff2d55;}
+.bc-status.bc-warn{color:#ffb340;border-color:#ffb340;}
+/* action popup */
+.bc-popup{background:var(--card);border:1px solid #3b64d6;border-radius:16px;
+  padding:16px;margin-bottom:14px;animation:bcFadeIn .15s ease;}
+@keyframes bcFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.bc-itemTitle{font-size:16px;font-weight:900;margin-bottom:4px;}
+.bc-actionGrid{display:grid;gap:8px;grid-template-columns:1fr 1fr 1fr;margin-top:12px;}
+.bc-actionBtn{padding:14px 10px;border-radius:14px;border:1px solid #2a3d6b;
+  font-size:13px;font-weight:800;cursor:pointer;text-align:center;}
+.bc-in  {background:#132a1f;border-color:#1f6a46;color:#26d07c;}
+.bc-out {background:#2b1a2a;border-color:#5b2b4c;color:#ff2d55;}
+.bc-trn {background:#1a1a3a;border-color:#3b64d6;color:#9fd3ff;}
+/* camera overlay */
+.bc-camOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+#bc-video{width:min(400px,95vw);border-radius:14px;border:3px solid #1a3cff;}
+.bc-camClose{padding:12px 28px;border-radius:999px;background:#ff2d55;
+  border:none;color:#fff;font-weight:800;font-size:16px;cursor:pointer;}
+.bc-scanLine{width:min(400px,95vw);height:3px;background:linear-gradient(90deg,transparent,#1a3cff,transparent);
+  animation:scanMove 1.5s linear infinite;}
+@keyframes scanMove{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.21.2/umd/index.min.js"></script>
 </head>
 <body>
 <header>
@@ -137,6 +198,7 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
           <button id="historyBtn"          class="btnGray">🕐 History</button>
           <button id="compareBtn"          class="btnGray">↔️ Compare</button>
           <button id="bulkApplyBtn"        class="btnGray">🎯 Bulk Apply</button>
+          <button id="warehouseBtn" class="btnGray" style="border-color:#6b4fa0;background:#1a0f2e;">🏭 Warehouse</button>
           <button id="resetBtn" class="btnRed">🧨 Reset Night</button>
         </div>
       </div>
@@ -244,6 +306,117 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
     </div>
   </div>
 </div>
+<!-- WAREHOUSE MODAL -->
+<div class="modalBackdrop" id="warehouseBackdrop">
+  <div class="modal" style="width:min(1100px,100%);max-height:92vh;overflow:auto;">
+
+    <!-- Header -->
+    <div class="flex" style="justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <b style="font-size:16px">🏭 Warehouse Inventory</b>
+        <div class="help" style="margin-top:2px;">Category → Brand/Type → Size. Track stock, set minimums, transfer to bars.</div>
+      </div>
+      <div class="flex" style="gap:8px;flex-wrap:wrap;">
+        <button id="whExportBtn"    class="btnBlue miniBtn">⬇️ Export CSV</button>
+        <button id="closeWhBtn"     class="btnGray miniBtn">✖ Close</button>
+      </div>
+    </div>
+
+    <hr/>
+
+    <!-- Barcode scanner bar -->
+    <div class="bc-bar">
+      <span style="font-size:18px;">📷</span>
+      <input id="bcInput" class="bc-input" placeholder="Scan barcode or type & press Enter…"
+        autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <button id="bcCamBtn" class="btnGray miniBtn" title="Use camera to scan">📸 Camera</button>
+      <span id="bcStatus" class="bc-status">Ready</span>
+    </div>
+
+    <!-- Scan result popup (hidden by default) -->
+    <div id="bcPopup" style="display:none;"></div>
+
+    <!-- Camera overlay (hidden by default) -->
+    <div class="bc-camOverlay" id="bcCamOverlay" style="display:none;">
+      <div style="color:#fff;font-size:14px;font-weight:700;">Point camera at barcode</div>
+      <video id="bc-video" autoplay playsinline muted></video>
+      <div class="bc-scanLine"></div>
+      <button class="bc-camClose" id="bcCamClose">✖ Cancel</button>
+    </div>
+
+    <!-- Default size unit selector -->
+    <div class="flex" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+      <span class="muted small">Default size unit:</span>
+      <button class="wh-sizePreset" data-unit="ml" id="whUnitMl">ml</button>
+      <button class="wh-sizePreset" data-unit="L"  id="whUnitL">L</button>
+      <span class="muted small" style="margin-left:8px;">Quick sizes:</span>
+      <div id="whSizePresets" class="flex" style="gap:6px;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- Category tabs -->
+    <div class="flex" style="gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="whCatTabs"></div>
+
+    <!-- Items grid -->
+    <div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));" id="whItems"></div>
+
+    <hr style="margin:16px 0;"/>
+
+    <!-- Add item form -->
+    <div class="box">
+      <b>Add / Edit Item</b>
+      <div class="wh-form" style="margin-top:10px;">
+        <div>
+          <label>Category (Group)</label>
+          <input id="whNewCat"   placeholder="e.g. Vodka" list="whCatList"/>
+          <datalist id="whCatList"></datalist>
+        </div>
+        <div>
+          <label>Brand / Type</label>
+          <input id="whNewBrand" placeholder="e.g. Grey Goose"/>
+        </div>
+        <div>
+          <label>Size</label>
+          <input id="whNewSize"  placeholder="750" style="width:80px;display:inline-block;"/>
+          <select id="whNewUnit" style="width:70px;display:inline-block;margin-left:6px;">
+            <option value="ml">ml</option>
+            <option value="L">L</option>
+          </select>
+        </div>
+        <div>
+          <label>Opening Stock</label>
+          <input id="whNewStock" type="number" min="0" value="0" placeholder="0"/>
+        </div>
+        <div>
+          <label>Min Stock Alert</label>
+          <input id="whNewMin"   type="number" min="0" value="0" placeholder="0"/>
+        </div>
+      </div>
+      <div class="rightFlex" style="margin-top:10px;gap:8px;">
+        <button id="whAddItemBtn" class="btnGreen">+ Add Item</button>
+      </div>
+    </div>
+
+    <hr style="margin:16px 0;"/>
+
+    <!-- Transfer log -->
+    <div>
+      <div class="flex" style="justify-content:space-between;align-items:center;">
+        <b>Transfer Log</b>
+        <span class="muted small">Warehouse → Bar movements</span>
+      </div>
+      <div class="wh-transferLog">
+        <table>
+          <thead><tr>
+            <th>Time</th><th>Item</th><th>Qty</th><th>To Bar</th><th>Note</th>
+          </tr></thead>
+          <tbody id="whTransferLog"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- Setup modal -->
 <div class="modalBackdrop" id="setupBackdrop" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true" aria-label="Setup">
@@ -603,7 +776,8 @@ const DEFAULT_CONFIG = {
 const DEFAULT_STORE = {
   activeNightId: DEFAULT_NIGHT_ID,
   global: { pinHash: "", defaultBucketText: "" },
-  nights: { [DEFAULT_NIGHT_ID]: deepClone(DEFAULT_CONFIG) }
+  nights: { [DEFAULT_NIGHT_ID]: deepClone(DEFAULT_CONFIG) },
+  warehouse: { items: [], transferLog: [], defaultUnit: "ml", defaultSize: 750 }
 };
 
 let store = deepClone(DEFAULT_STORE);
@@ -1755,7 +1929,7 @@ async function exportBackup(){
   if(!okPin) return;
   const out = {
     app: "Inventory Clicker",
-    schemaVersion: 2,
+    schemaVersion: 3,
     exportedAt: new Date().toISOString(),
     store: store,
     nightData: {}
@@ -2322,6 +2496,10 @@ store.global ||= {pinHash:"", defaultBucketText:""};
 if(typeof store.global.defaultBucketText !== "string") store.global.defaultBucketText = "";
 
 // ── Migrate existing data: ensure group field on all sections ──
+if(!store.warehouse) store.warehouse = { items: [], transferLog: [], defaultUnit: "ml", defaultSize: 750 };
+if(!store.warehouse.transferLog) store.warehouse.transferLog = [];
+if(!store.warehouse.defaultUnit) store.warehouse.defaultUnit = "ml";
+if(!store.warehouse.defaultSize) store.warehouse.defaultSize = 750;
 for(const cfg of Object.values(store.nights||{})){
   if(!cfg.pars) cfg.pars = {};
   if(Array.isArray(cfg.sections)){
@@ -2348,6 +2526,559 @@ renderAll();
 updatePinStatus();
 renderSetup();
 
+
+
+
+/* =====================================================================
+   WAREHOUSE MODULE
+===================================================================== */
+
+/* ---- Helpers ---- */
+function whGet(){ return store.warehouse || (store.warehouse={items:[],transferLog:[],defaultUnit:"ml",defaultSize:750}); }
+function whSave(){ return saveStore(); }
+function whGenId(){ return "wh_"+Date.now()+"_"+Math.random().toString(36).slice(2,7); }
+
+function whFormatSize(item){
+  const sz = item.size||""; const u = item.sizeUnit||item.unit||"ml";
+  return sz ? sz+u : "";
+}
+function whItemLabel(item){ return `${item.brand||""}${whFormatSize(item)?" – "+whFormatSize(item):""}`.trim() || item.id; }
+function whCategories(){
+  const seen=new Set(), out=[];
+  for(const it of (whGet().items||[])){
+    const c=it.category||"Other"; if(!seen.has(c)){seen.add(c);out.push(c);}
+  }
+  return out.length?out:[];
+}
+function whLowCount(cat){
+  return (whGet().items||[]).filter(it=>it.category===cat && Number(it.minStock)>0 && Number(it.stock)<Number(it.minStock)).length;
+}
+
+/* ---- State ---- */
+var _whCat = null;   // currently selected category
+
+/* ---- Render category tabs ---- */
+function whRenderCatTabs(){
+  const cats = whCategories();
+  if(!_whCat || !cats.includes(_whCat)) _whCat = cats[0]||null;
+  const wrap = el("whCatTabs"); if(!wrap) return;
+  wrap.innerHTML = "";
+
+  // "All" tab
+  const all = document.createElement("div");
+  all.className = "wh-catTab" + (_whCat===null?" active":"");
+  all.textContent = "📦 All";
+  all.onclick=()=>{ _whCat=null; whRenderCatTabs(); whRenderItems(); };
+  wrap.appendChild(all);
+
+  cats.forEach(cat=>{
+    const low = whLowCount(cat);
+    const d = document.createElement("div");
+    d.className = "wh-catTab" + (cat===_whCat?" active":"");
+    d.innerHTML = escapeHtml(cat) + (low?`<span class="wh-lowBadge">${low}</span>`:"");
+    d.onclick=()=>{ _whCat=cat; whRenderCatTabs(); whRenderItems(); };
+    wrap.appendChild(d);
+  });
+
+  // Refresh datalist
+  const dl = el("whCatList"); if(dl){ dl.innerHTML=""; cats.forEach(c=>{ const o=document.createElement("option"); o.value=c; dl.appendChild(o); }); }
+
+  // Auto-fill category input if one is selected
+  const cinp = el("whNewCat"); if(cinp && _whCat && !cinp.value) cinp.value = _whCat;
+}
+
+/* ---- Render items grid ---- */
+function whRenderItems(){
+  const wrap = el("whItems"); if(!wrap) return;
+  wrap.innerHTML = "";
+  const wh = whGet();
+  const items = (wh.items||[]).filter(it=> _whCat===null || it.category===_whCat);
+
+  if(!items.length){
+    wrap.innerHTML = `<div class="muted small" style="grid-column:1/-1;padding:12px;">No items${_whCat?" in "+escapeHtml(_whCat):""}. Add one below.</div>`;
+    return;
+  }
+
+  // Group by category if "All"
+  const groups = _whCat ? {[_whCat]: items} :
+    items.reduce((a,it)=>{ (a[it.category||"Other"]||=[]).push(it); return a; },{});
+
+  for(const [grp, grpItems] of Object.entries(groups)){
+    if(_whCat===null){
+      const grpHdr = document.createElement("div");
+      grpHdr.style.cssText="grid-column:1/-1;font-weight:900;font-size:14px;color:#9fd3ff;padding:6px 0 2px;";
+      grpHdr.textContent = "📦 "+grp;
+      wrap.appendChild(grpHdr);
+    }
+    for(const item of grpItems){
+      const stock = Number(item.stock)||0;
+      const minSt = Number(item.minStock)||0;
+      const isLow = minSt>0 && stock<minSt;
+      const card = document.createElement("div");
+      card.className = "wh-itemCard" + (isLow?" wh-low":(stock>0?" wh-ok":""));
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div>
+            <div style="font-weight:800;font-size:14px;">${escapeHtml(item.brand||"—")}</div>
+            <div style="font-size:11px;color:var(--muted);">${escapeHtml(item.category||"")}${whFormatSize(item)?" · "+escapeHtml(whFormatSize(item)):""}</div>
+            ${isLow?`<div class="wh-lowAlert">⚠ Low stock (min ${minSt})</div>`:""}
+          </div>
+          <div class="wh-stockBox">
+            <div class="wh-stockNum" id="whStock_${item.id}">${stock}</div>
+            <div class="wh-stockSub">bottles</div>
+          </div>
+        </div>
+        <div class="wh-pm">
+          <button class="wh-minus" data-whid="${item.id}" data-act="dec">−</button>
+          <button class="wh-plus"  data-whid="${item.id}" data-act="inc">+</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btnGray miniBtn" data-whid="${item.id}" data-act="transfer" style="flex:1;">↗ Transfer to Bar</button>
+          <button class="btnGray miniBtn" data-whid="${item.id}" data-act="setMin"   style="flex:0;">⚙ Min</button>
+          <button class="btnRed  miniBtn" data-whid="${item.id}" data-act="del"      style="flex:0;">🗑</button>
+        </div>`;
+      wrap.appendChild(card);
+    }
+  }
+
+  // Wire buttons
+  wrap.querySelectorAll("[data-whid]").forEach(btn=>{
+    btn.onclick = async()=>{
+      const id   = btn.getAttribute("data-whid");
+      const act  = btn.getAttribute("data-act");
+      const wh   = whGet();
+      const item = wh.items.find(i=>i.id===id);
+      if(!item) return;
+
+      if(act==="inc"){
+        item.stock = (Number(item.stock)||0) + 1;
+        await whSave(); whRenderItems(); whRenderCatTabs();
+      } else if(act==="dec"){
+        if((Number(item.stock)||0) <= 0) return;
+        item.stock = (Number(item.stock)||0) - 1;
+        await whSave(); whRenderItems(); whRenderCatTabs();
+      } else if(act==="setMin"){
+        const val = prompt(`Minimum stock alert for "${whItemLabel(item)}":\n(0 = disabled)`, item.minStock||0);
+        if(val===null) return;
+        item.minStock = Math.max(0, parseInt(val)||0);
+        await whSave(); whRenderItems(); whRenderCatTabs();
+      } else if(act==="transfer"){
+        const qty = prompt(`Transfer how many bottles of "${whItemLabel(item)}" to bar?\n(Current stock: ${item.stock})`, 1);
+        if(qty===null) return;
+        const n = Math.max(1, parseInt(qty)||1);
+        if(n > (Number(item.stock)||0)){ alert("Not enough stock."); return; }
+        const dest = prompt("Destination bar name:", bar||"Bar");
+        if(dest===null) return;
+        item.stock = (Number(item.stock)||0) - n;
+        wh.transferLog.unshift({ ts: new Date().toISOString(), item: whItemLabel(item), qty: n, to: dest, note:"" });
+        if(wh.transferLog.length > 200) wh.transferLog.length = 200;
+        await whSave(); whRenderItems(); whRenderCatTabs(); whRenderLog();
+        toast(`Transferred ${n}× ${whItemLabel(item)} → ${dest}`);
+      } else if(act==="del"){
+        if(!confirm(`Delete "${whItemLabel(item)}" from warehouse?`)) return;
+        wh.items = wh.items.filter(i=>i.id!==id);
+        await whSave(); whRenderCatTabs(); whRenderItems();
+      }
+    };
+  });
+}
+
+/* ---- Transfer log ---- */
+function whRenderLog(){
+  const tbody = el("whTransferLog"); if(!tbody) return;
+  const log = (whGet().transferLog||[]).slice(0,50);
+  if(!log.length){ tbody.innerHTML=`<tr><td colspan="5" class="muted" style="padding:10px;">No transfers yet.</td></tr>`; return; }
+  tbody.innerHTML = log.map(e=>`<tr>
+    <td class="muted" style="font-size:11px;white-space:nowrap;">${new Date(e.ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</td>
+    <td style="font-weight:700;">${escapeHtml(e.item)}</td>
+    <td style="text-align:center;font-weight:900;">×${e.qty}</td>
+    <td>${escapeHtml(e.to||"")}</td>
+    <td class="muted">${escapeHtml(e.note||"")}</td>
+  </tr>`).join("");
+}
+
+/* ---- Size presets ---- */
+const WH_SIZE_PRESETS_ML = [200,350,500,700,750,1000,1750];
+const WH_SIZE_PRESETS_L  = [0.2,0.35,0.5,0.7,0.75,1,1.75];
+
+function whRenderSizePresets(){
+  const wh = whGet();
+  const unit = wh.defaultUnit||"ml";
+  const presets = unit==="ml" ? WH_SIZE_PRESETS_ML : WH_SIZE_PRESETS_L;
+  const wrap = el("whSizePresets"); if(!wrap) return;
+  wrap.innerHTML = "";
+  presets.forEach(sz=>{
+    const btn = document.createElement("button");
+    btn.className = "wh-sizePreset" + (String(sz)===String(wh.defaultSize)?" active":"");
+    btn.textContent = sz+unit;
+    btn.onclick = ()=>{
+      whGet().defaultSize = sz;
+      el("whNewSize").value = sz;
+      el("whNewUnit").value = unit;
+      saveStore();
+      whRenderSizePresets();
+    };
+    wrap.appendChild(btn);
+  });
+  // Set active unit button
+  el("whUnitMl")?.classList.toggle("active", unit==="ml");
+  el("whUnitL" )?.classList.toggle("active", unit==="L");
+}
+
+// Unit toggle
+el("whUnitMl").onclick=()=>{
+  whGet().defaultUnit="ml"; whGet().defaultSize=750;
+  el("whNewUnit").value="ml"; el("whNewSize").value="750";
+  saveStore(); whRenderSizePresets();
+};
+el("whUnitL").onclick=()=>{
+  whGet().defaultUnit="L"; whGet().defaultSize=0.75;
+  el("whNewUnit").value="L"; el("whNewSize").value="0.75";
+  saveStore(); whRenderSizePresets();
+};
+
+/* ---- Add item ---- */
+el("whAddItemBtn").onclick = async()=>{
+  const cat   = el("whNewCat").value.trim();
+  const brand = el("whNewBrand").value.trim();
+  const size  = el("whNewSize").value.trim();
+  const unit  = el("whNewUnit").value;
+  const stock = Math.max(0, parseInt(el("whNewStock").value)||0);
+  const minSt = Math.max(0, parseInt(el("whNewMin").value)||0);
+
+  if(!cat)  { alert("Enter a category (e.g. Vodka)"); return; }
+  if(!brand){ alert("Enter a brand/type name"); return; }
+
+  const wh = whGet();
+  // Check duplicate
+  const dup = wh.items.find(i=>i.category===cat && i.brand===brand && (i.size||"")===size && (i.sizeUnit||i.unit||"ml")===unit);
+  if(dup){ alert("This item already exists. Update its stock directly on the card."); return; }
+
+  wh.items.push({ id: whGenId(), category: cat, brand, size, sizeUnit: unit, stock, minStock: minSt });
+  _whCat = cat;
+  await whSave();
+  // Clear form (keep category for easy multi-add)
+  el("whNewBrand").value=""; el("whNewStock").value="0"; el("whNewMin").value="0";
+  whRenderCatTabs(); whRenderItems();
+  toast(`Added: ${brand}${size?" ("+size+unit+")":""}`);
+};
+
+/* ---- Export warehouse CSV ---- */
+el("whExportBtn").onclick=()=>{
+  const wh = whGet();
+  const rows = [["Category","Brand/Type","Size","Unit","Stock","Min Stock"].map(csvCell).join(",")];
+  for(const it of wh.items||[]){
+    rows.push([csvCell(it.category),csvCell(it.brand),csvCell(it.size),csvCell(it.sizeUnit||it.unit||"ml"),csvCell(it.stock),csvCell(it.minStock||0)].join(","));
+  }
+  downloadText(`warehouse_${safeFilePart(new Date().toLocaleDateString())}.csv`, rows.join("\n"), "text/csv;charset=utf-8");
+};
+
+/* ---- Open / close warehouse ---- */
+function openWarehouse(){
+  const wh = whGet();
+  // Set default unit buttons
+  el("whNewUnit").value = wh.defaultUnit||"ml";
+  el("whNewSize").value = wh.defaultSize||750;
+  whRenderSizePresets();
+  whRenderCatTabs();
+  whRenderItems();
+  whRenderLog();
+  el("warehouseBackdrop").style.display="flex";
+}
+el("warehouseBtn").onclick = openWarehouse;
+el("closeWhBtn").onclick   = ()=>{ el("warehouseBackdrop").style.display="none"; };
+el("warehouseBackdrop").addEventListener("click", e=>{
+  if(e.target===el("warehouseBackdrop")) el("warehouseBackdrop").style.display="none";
+});
+// ESC
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape" && el("warehouseBackdrop")?.style.display==="flex")
+    el("warehouseBackdrop").style.display="none";
+});
+
+
+
+/* =====================================================================
+   BARCODE SCANNER MODULE
+   - USB/Bluetooth HID scanner: fires keystrokes fast → detected by timing
+   - Camera: ZXing library via CDN
+===================================================================== */
+
+/* ---- Barcode ↔ item registry ---- */
+// Stored in store.warehouse.barcodes = { "barcode_string": "item_id" }
+function bcGetRegistry(){ const wh=whGet(); if(!wh.barcodes) wh.barcodes={}; return wh.barcodes; }
+function bcLookup(code){ return bcGetRegistry()[code.trim()]||null; }
+function bcRegister(code, itemId){ bcGetRegistry()[code.trim()]=itemId; return whSave(); }
+function bcUnregister(code){ delete bcGetRegistry()[code.trim()]; return whSave(); }
+
+/* ---- Hardware scanner detection ----
+   Scanners type very fast (< 50ms between chars) then send Enter.
+   We buffer input and fire on Enter or after a speed-burst. */
+var _bcBuf = "";
+var _bcLastKey = 0;
+const BC_SPEED_THRESHOLD = 60; // ms — faster than human typing
+const BC_MIN_LEN = 4;
+
+function bcSetStatus(msg, cls){
+  const s = el("bcStatus"); if(!s) return;
+  s.textContent = msg;
+  s.className = "bc-status" + (cls?" "+cls:"");
+}
+function bcSetInputState(cls){
+  const inp = el("bcInput"); if(!inp) return;
+  inp.className = "bc-input" + (cls?" "+cls:"");
+}
+
+/* Wire the manual input field */
+el("bcInput").addEventListener("keydown", e=>{
+  const now = Date.now();
+  const gap = now - _bcLastKey;
+  _bcLastKey = now;
+
+  // Detect hardware scanner burst (very fast typing)
+  if(gap < BC_SPEED_THRESHOLD && e.key.length===1) _bcBuf += e.key;
+  else if(e.key.length===1 && e.key !== "Enter") _bcBuf = e.key;
+
+  if(e.key==="Enter"){
+    e.preventDefault();
+    const code = (el("bcInput").value||_bcBuf).trim();
+    _bcBuf = "";
+    if(code.length >= BC_MIN_LEN) bcHandleScan(code);
+    else bcSetStatus("Too short — need ≥ "+BC_MIN_LEN+" chars", "bc-warn");
+  }
+});
+
+// Also handle paste (for testing)
+el("bcInput").addEventListener("paste", e=>{
+  setTimeout(()=>{
+    const code = (el("bcInput").value||"").trim();
+    if(code.length >= BC_MIN_LEN){ el("bcInput").value=""; bcHandleScan(code); }
+  }, 50);
+});
+
+/* ---- Main scan handler ---- */
+function bcHandleScan(code){
+  el("bcInput").value = "";
+  bcSetInputState("");
+  const itemId = bcLookup(code);
+  const wh = whGet();
+
+  if(itemId){
+    const item = wh.items.find(i=>i.id===itemId);
+    if(item){
+      bcSetStatus("✓ Found: "+escapeHtml(item.brand||""), "bc-ok");
+      bcSetInputState("bc-found");
+      bcShowActionPopup(item, code);
+      return;
+    }
+  }
+
+  // Not found — offer to register
+  bcSetStatus("⚠ Barcode not registered", "bc-warn");
+  bcSetInputState("bc-notfound");
+  bcShowRegisterPopup(code);
+}
+
+/* ---- Action popup: IN / OUT / TRANSFER ---- */
+function bcShowActionPopup(item, code){
+  const popup = el("bcPopup"); if(!popup) return;
+  const stock = Number(item.stock)||0;
+  const fmt = whFormatSize(item);
+  popup.style.display="block";
+  popup.innerHTML = `
+    <div class="bc-popup">
+      <div class="bc-itemTitle">📦 ${escapeHtml(item.brand||"")}</div>
+      <div class="muted small">${escapeHtml(item.category||"")}${fmt?" · "+escapeHtml(fmt):""} &nbsp;|&nbsp; Stock: <b>${stock}</b></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">Barcode: <span style="font-family:monospace;">${escapeHtml(code)}</span></div>
+      <div class="bc-actionGrid">
+        <button class="bc-actionBtn bc-in"  id="bcActIn">📥 Stock IN</button>
+        <button class="bc-actionBtn bc-out" id="bcActOut">📤 Stock OUT</button>
+        <button class="bc-actionBtn bc-trn" id="bcActTrn">↗ Transfer</button>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <label style="font-size:12px;color:var(--muted);margin:0;">Qty:</label>
+        <input id="bcQty" type="number" min="1" value="1"
+          style="width:80px;font-size:15px;font-weight:800;text-align:center;padding:8px;border-radius:10px;"/>
+        <button class="btnGray miniBtn" id="bcActCancel">Cancel</button>
+        <button class="btnGray miniBtn" id="bcUnlinkBtn"
+          style="margin-left:auto;font-size:11px;color:var(--muted);">Unlink barcode</button>
+      </div>
+    </div>`;
+
+  // Focus qty input
+  setTimeout(()=>{ el("bcQty")?.select(); }, 50);
+
+  async function doAction(action){
+    const qty = Math.max(1, parseInt(el("bcQty")?.value)||1);
+    const wh2 = whGet();
+    const it2 = wh2.items.find(i=>i.id===item.id);
+    if(!it2) return;
+
+    if(action==="in"){
+      it2.stock = (Number(it2.stock)||0) + qty;
+      await whSave();
+      bcSetStatus(`+${qty} → ${it2.brand} (stock: ${it2.stock})`, "bc-ok");
+      toast(`📥 Stock IN ×${qty}: ${it2.brand}`);
+    } else if(action==="out"){
+      if(qty > (Number(it2.stock)||0)){ bcSetStatus("Not enough stock!", "bc-err"); return; }
+      it2.stock = (Number(it2.stock)||0) - qty;
+      await whSave();
+      bcSetStatus(`−${qty} → ${it2.brand} (stock: ${it2.stock})`, "bc-ok");
+      toast(`📤 Stock OUT ×${qty}: ${it2.brand}`);
+    } else if(action==="transfer"){
+      if(qty > (Number(it2.stock)||0)){ bcSetStatus("Not enough stock!", "bc-err"); return; }
+      it2.stock = (Number(it2.stock)||0) - qty;
+      wh2.transferLog.unshift({ ts: new Date().toISOString(), item: whItemLabel(it2), qty, to: bar||"Bar", note:"barcode" });
+      if(wh2.transferLog.length>200) wh2.transferLog.length=200;
+      await whSave();
+      bcSetStatus(`↗ ${qty}× → ${bar||"Bar"}`, "bc-ok");
+      toast(`↗ Transferred ×${qty}: ${it2.brand}`);
+      whRenderLog();
+    }
+
+    popup.style.display="none";
+    bcSetInputState("");
+    whRenderItems(); whRenderCatTabs();
+    // Re-focus scanner input
+    setTimeout(()=>el("bcInput")?.focus(), 100);
+  }
+
+  el("bcActIn" ).onclick = ()=>doAction("in");
+  el("bcActOut").onclick = ()=>doAction("out");
+  el("bcActTrn").onclick = ()=>doAction("transfer");
+  el("bcActCancel").onclick = ()=>{ popup.style.display="none"; bcSetStatus("Ready"); bcSetInputState(""); el("bcInput")?.focus(); };
+  el("bcUnlinkBtn").onclick = async()=>{
+    if(!confirm(`Unlink barcode "${code}" from "${item.brand}"?`)) return;
+    await bcUnregister(code);
+    popup.style.display="none"; bcSetStatus("Unlinked", "bc-warn");
+    el("bcInput")?.focus();
+  };
+
+  // Enter on qty = Stock IN by default
+  el("bcQty").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); doAction("in"); } });
+}
+
+/* ---- Register popup: link barcode to item ---- */
+function bcShowRegisterPopup(code){
+  const popup = el("bcPopup"); if(!popup) return;
+  const wh = whGet();
+  const opts = (wh.items||[]).map(it=>`<option value="${escapeHtml(it.id)}">${escapeHtml(it.category||"")} — ${escapeHtml(it.brand||"")}${whFormatSize(it)?" ("+whFormatSize(it)+")":""}</option>`).join("");
+  popup.style.display="block";
+  popup.innerHTML = `
+    <div class="bc-popup" style="border-color:#ffb340;">
+      <div class="bc-itemTitle" style="color:#ffb340;">⚠ Barcode not registered</div>
+      <div class="muted small" style="margin-bottom:10px;font-family:monospace;">${escapeHtml(code)}</div>
+      ${opts ? `
+        <div style="margin-bottom:8px;"><b style="font-size:13px;">Link to existing item:</b></div>
+        <div class="flex" style="gap:8px;flex-wrap:wrap;">
+          <select id="bcRegSel" style="flex:1;min-width:200px;">${opts}</select>
+          <button class="btnGreen miniBtn" id="bcRegLinkBtn">Link Barcode</button>
+        </div>
+        <div style="margin:10px 0;text-align:center;color:var(--muted);font-size:12px;">— or —</div>` : ""}
+      <div class="help" style="margin-bottom:6px;">Add as new item with this barcode:</div>
+      <div class="wh-form">
+        <div><label>Category</label><input id="bcRegCat" placeholder="e.g. Vodka" list="whCatList"/></div>
+        <div><label>Brand / Type</label><input id="bcRegBrand" placeholder="e.g. Grey Goose"/></div>
+        <div><label>Size</label>
+          <input id="bcRegSize" placeholder="750" style="width:75px;display:inline-block;"/>
+          <select id="bcRegUnit" style="width:65px;display:inline-block;margin-left:4px;">
+            <option value="ml">ml</option><option value="L">L</option>
+          </select>
+        </div>
+        <div><label>Opening Stock</label><input id="bcRegStock" type="number" min="0" value="1"/></div>
+        <div><label>Min Stock</label><input id="bcRegMin" type="number" min="0" value="0"/></div>
+      </div>
+      <div class="rightFlex" style="margin-top:10px;gap:8px;">
+        <button class="btnGray miniBtn" id="bcRegCancel">Cancel</button>
+        <button class="btnBlue miniBtn" id="bcRegAddBtn">+ Add & Link</button>
+      </div>
+    </div>`;
+
+  if(opts){
+    el("bcRegLinkBtn").onclick = async()=>{
+      const selId = el("bcRegSel").value;
+      if(!selId) return;
+      await bcRegister(code, selId);
+      const it = wh.items.find(i=>i.id===selId);
+      popup.style.display="none";
+      bcSetStatus("✓ Linked: "+(it?.brand||""), "bc-ok");
+      bcSetInputState("");
+      toast("Barcode linked to "+( it?.brand||"item"));
+      el("bcInput")?.focus();
+    };
+  }
+
+  el("bcRegAddBtn").onclick = async()=>{
+    const cat   = el("bcRegCat").value.trim();
+    const brand = el("bcRegBrand").value.trim();
+    const size  = el("bcRegSize").value.trim();
+    const unit  = el("bcRegUnit").value;
+    const stock = Math.max(0, parseInt(el("bcRegStock").value)||0);
+    const minSt = Math.max(0, parseInt(el("bcRegMin").value)||0);
+    if(!cat||!brand){ alert("Category and Brand are required."); return; }
+    const newId = whGenId();
+    wh.items.push({ id:newId, category:cat, brand, size, sizeUnit:unit, stock, minStock:minSt });
+    await bcRegister(code, newId); // also saves
+    _whCat = cat;
+    popup.style.display="none";
+    bcSetStatus("✓ Added & linked: "+brand, "bc-ok");
+    bcSetInputState("");
+    whRenderCatTabs(); whRenderItems();
+    toast("Added & linked: "+brand);
+    el("bcInput")?.focus();
+  };
+
+  el("bcRegCancel").onclick = ()=>{ popup.style.display="none"; bcSetStatus("Ready"); bcSetInputState(""); el("bcInput")?.focus(); };
+}
+
+/* ---- Camera scanner (ZXing) ---- */
+var _bcCamActive = false;
+var _bcReader = null;
+
+el("bcCamBtn").onclick = async()=>{
+  if(_bcCamActive){ bcStopCamera(); return; }
+  el("bcCamOverlay").style.display="flex";
+  _bcCamActive = true;
+  try{
+    const ZXing = window.ZXing || window.ZXingBrowser;
+    if(!ZXing){ alert("ZXing library not loaded. Check your internet connection."); bcStopCamera(); return; }
+
+    const hints = new Map();
+    const formats = [
+      ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
+      ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+      ZXing.BarcodeFormat.UPC_A, ZXing.BarcodeFormat.UPC_E,
+      ZXing.BarcodeFormat.QR_CODE,
+    ];
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
+
+    _bcReader = new ZXing.BrowserMultiFormatReader(hints);
+    await _bcReader.decodeFromVideoDevice(null, "bc-video", (result, err)=>{
+      if(result){
+        const code = result.getText();
+        bcStopCamera();
+        bcHandleScan(code);
+      }
+    });
+  }catch(e){
+    alert("Camera error: "+e.message);
+    bcStopCamera();
+  }
+};
+
+function bcStopCamera(){
+  _bcCamActive = false;
+  if(_bcReader){ try{ _bcReader.reset(); }catch(e){} _bcReader=null; }
+  el("bcCamOverlay").style.display="none";
+}
+el("bcCamClose").onclick = bcStopCamera;
+
+/* Auto-focus scanner input when warehouse opens */
+const _origOpenWarehouse = openWarehouse;
+openWarehouse = function(){
+  _origOpenWarehouse();
+  setTimeout(()=>el("bcInput")?.focus(), 100);
+};
 
 
 })();</script>
