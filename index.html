@@ -182,7 +182,29 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
 .navRow .pill{font-size:11px;border-radius:999px;border:1px solid #22325b;background:#0d1630;padding:4px 10px;color:var(--muted);}
 .navRow.active{border-color:#3b64d6;box-shadow:0 0 0 2px rgba(59,100,214,.15) inset;}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.21.2/umd/index.min.js"></script>
+<script>
+/* ZXing loader: tries multiple CDNs (helps when one is blocked). */
+(function(){
+  const urls = [
+    "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js",
+    "https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js",
+    "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.2/umd/index.min.js",
+    "https://unpkg.com/@zxing/library@0.21.2/umd/index.min.js"
+  ];
+  let i = 0;
+  function tryNext(){
+    if(window.ZXing || window.ZXingBrowser) return;
+    if(i >= urls.length) return;
+    const s = document.createElement("script");
+    s.src = urls[i++];
+    s.async = true;
+    s.onload = ()=>{ /* loaded */ };
+    s.onerror = ()=>{ tryNext(); };
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
 </head>
 <body>
 <header>
