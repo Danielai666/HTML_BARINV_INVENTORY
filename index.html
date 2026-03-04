@@ -371,6 +371,9 @@ hr{border:none;border-top:1px solid #22325b;margin:14px 0}
         <div class="help" style="margin-top:2px;">Category → Brand/Type → Size. Track stock, set minimums, transfer to bars.</div>
       </div>
       <div class="flex" style="gap:8px;flex-wrap:wrap;">
+        
+        <button id="whImportBclBtn" class="btnGreen miniBtn">⬆️ Import BCL CSV</button>
+        <input id="whImportBclFile" type="file" accept=".csv,text/csv" style="display:none" />
         <button id="whExportBtn"    class="btnBlue miniBtn">⬇️ Export CSV</button>
         <button id="closeWhBtn"     class="btnGray miniBtn">✖ Close</button>
       </div>
@@ -2764,6 +2767,139 @@ renderSetup();
 function whGet(){ return store.warehouse || (store.warehouse={items:[],transferLog:[],defaultUnit:"ml",defaultSize:750}); }
 function whSave(){ return saveStore(); }
 function whGenId(){ return "wh_"+Date.now()+"_"+Math.random().toString(36).slice(2,7); }
+/* ---- Import: BC Liquor Store Price List CSV (with UPC) ----
+   Expected columns (from your file):
+   PRODUCT_LONG_NAME, PRODUCT_BASE_UPC_NO, PRODUCT_LITRES_PER_CONTAINER,
+   ITEM_CATEGORY_NAME (optional), PRODUCT_SKU_NO (optional), PRODUCT_PRICE (optional)
+   This will MERGE into warehouse items + barcode registry (does not touch nights).
+*/
+function csvParse(text){
+  // Robust enough for typical CSV (quotes + commas). Not for multiline quoted fields.
+  const lines = text.replace(/\r/g,"").split("\n").filter(l=>l.trim().length);
+  if(!lines.length) return {headers:[], rows:[]};
+  const parseLine = (line)=>{
+    const out=[]; let cur=""; let inQ=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch === '"'){
+        if(inQ && line[i+1]==='"'){ cur+='"'; i++; }
+        else inQ = !inQ;
+      }else if(ch === "," && !inQ){
+        out.push(cur); cur="";
+      }else{
+        cur += ch;
+      }
+    }
+    out.push(cur);
+    return out.map(s=>s.trim());
+  };
+  const headers = parseLine(lines[0]);
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const cols = parseLine(lines[i]);
+    if(cols.length===1 && cols[0]==="") continue;
+    const row = {};
+    for(let c=0;c<headers.length;c++){
+      row[headers[c]] = cols[c] ?? "";
+    }
+    rows.push(row);
+  }
+  return {headers, rows};
+}
+function toUpcString(v){
+  if(v===null || v===undefined) return "";
+  let s = String(v).trim();
+  if(!s) return "";
+  // Handle scientific notation coming from Excel exports
+  if(/[eE]/.test(s)){
+    const n = Number(s);
+    if(Number.isFinite(n)) s = Math.round(n).toString();
+  }
+  // Remove trailing .0
+  if(/^\d+\.0$/.test(s)) s = s.slice(0,-2);
+  // Remove non-digits
+  s = s.replace(/[^\d]/g,"");
+  return s;
+}
+function litresToSizeUnit(litresRaw){
+  const n = Number(String(litresRaw||"").trim());
+  if(!Number.isFinite(n) || n<=0) return {size:"", unit:"ml"};
+  if(n>=1) return {size:String(Math.round(n*1000)), unit:"ml"}; // keep ml for consistency
+  return {size:String(Math.round(n*1000)), unit:"ml"};
+}
+async function whImportBclCsvText(csvText){
+  const {rows} = csvParse(csvText);
+  if(!rows.length){ toast("CSV is empty."); return; }
+
+  const wh = whGet();
+  if(!Array.isArray(wh.items)) wh.items = [];
+  if(!wh.barcodes) wh.barcodes = {};
+
+  // Build reverse map for existing barcodes -> itemId
+  const reg = bcGetRegistry();
+  const existingUpcs = new Set(Object.keys(reg));
+  const existingSku  = new Set((wh.items||[]).map(it=> String(it.sku||"").trim()).filter(Boolean));
+
+  let added=0, linked=0, skipped=0;
+
+  for(const r of rows){
+    const upc = toUpcString(r["PRODUCT_BASE_UPC_NO"] ?? r["UPC"] ?? r["upc"]);
+    const name = String(r["PRODUCT_LONG_NAME"] ?? r["NAME"] ?? "").trim();
+    const cat  = String(r["ITEM_CATEGORY_NAME"] ?? r["CATEGORY"] ?? "Other").trim() || "Other";
+    const sku  = String(r["PRODUCT_SKU_NO"] ?? r["SKU"] ?? "").trim();
+    const price = String(r["PRODUCT_PRICE"] ?? "").trim();
+    const abv = String(r["PRODUCT_ALCOHOL_PERCENT"] ?? "").trim();
+    const {size, unit} = litresToSizeUnit(r["PRODUCT_LITRES_PER_CONTAINER"]);
+    if(!name) { skipped++; continue; }
+
+    // If UPC already linked, skip.
+    if(upc && existingUpcs.has(upc)){ skipped++; continue; }
+
+    // If SKU already exists and has some barcode, skip duplicate item creation.
+    if(sku && existingSku.has(sku)){
+      // But if UPC exists, try to link it to that SKU item
+      if(upc){
+        const it = wh.items.find(x=>String(x.sku||"").trim()===sku);
+        if(it){
+          wh.barcodes[upc]=it.id;
+          existingUpcs.add(upc);
+          linked++;
+        }else skipped++;
+      }else skipped++;
+      continue;
+    }
+
+    // Create new warehouse item
+    const id = whGenId();
+    const item = {
+      id,
+      category: cat,
+      brand: name,
+      size: size || String(wh.defaultSize||750),
+      sizeUnit: unit || (wh.defaultUnit||"ml"),
+      stock: 0,
+      min: 0,
+      sku: sku || "",
+      price: price || "",
+      abv: abv || ""
+    };
+    wh.items.push(item);
+    if(sku) existingSku.add(sku);
+    added++;
+
+    // Link UPC if available
+    if(upc){
+      wh.barcodes[upc]=id;
+      existingUpcs.add(upc);
+      linked++;
+    }
+  }
+
+  await whSave();
+  whRender();
+  toast(`Imported: ${added} items • Linked: ${linked} barcodes • Skipped: ${skipped}`);
+}
+
 
 function whFormatSize(item){
   const sz = item.size||""; const u = item.sizeUnit||item.unit||"ml";
@@ -2989,6 +3125,16 @@ el("whAddItemBtn").onclick = async()=>{
   whRenderCatTabs(); whRenderItems();
   toast(`Added: ${brand}${size?" ("+size+unit+")":""}`);
 };
+
+/* ---- Import BC Liquor CSV ---- */
+el("whImportBclBtn").onclick = ()=> el("whImportBclFile").click();
+el("whImportBclFile").addEventListener("change", async(e)=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const txt = await f.text();
+  await whImportBclCsvText(txt);
+  e.target.value = "";
+});
 
 /* ---- Export warehouse CSV ---- */
 el("whExportBtn").onclick=()=>{
