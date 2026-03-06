@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="fa">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inventory MVP</title>
+<style>
+:root{--bg:#0b1220;--card:#111a2e;--line:#203056;--muted:#a9b6d6;--text:#e8eefc;--red:#ff2d55;--green:#26d07c;--btn:#1a2a52;}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);direction:rtl}
+header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;justify-content:space-between}
+h1{font-size:16px;margin:0}
+main{padding:14px 16px;max-width:1100px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1;min-width:260px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+input,select,textarea{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0c1528;color:var(--text);outline:none}
+button{padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--btn);color:var(--text);cursor:pointer}
+button.primary{background:#2a56ff;border-color:#2a56ff}
+button.danger{background:transparent;border-color:var(--red);color:var(--red)}
+.badge{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px}
+.ok{color:var(--green)} .err{color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{border-bottom:1px solid var(--line);padding:8px;text-align:right;vertical-align:top}
+small{color:var(--muted)}
+hr{border:none;border-top:1px solid var(--line);margin:12px 0}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<header>
+  <h1>Inventory MVP — Admin / Barback</h1>
+  <div id="userBadge" class="badge">وضعیت: <span id="statusTxt">خارج</span></div>
+</header>
+
+<main>
+  <div class="card" id="loginCard">
+    <h2 style="margin:0 0 10px;font-size:14px">ورود</h2>
+    <div class="row">
+      <div class="col">
+        <label>Username</label>
+        <input id="loginUser" placeholder="مثال: admin" autocomplete="username" />
+      </div>
+      <div class="col">
+        <label>PIN</label>
+        <input id="loginPin" placeholder="****" type="password" inputmode="numeric" autocomplete="current-password"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
+      <button class="primary" id="btnLogin">Login</button>
+      <button id="btnLogout" class="danger hidden">Logout</button>
+      <span id="loginMsg" class="badge"></span>
+    </div>
+    <hr/>
+    <div>
+      <details>
+        <summary>Bootstrap (فقط اولین بار برای ساخت Admin)</summary>
+        <div class="row">
+          <div class="col"><label>Username</label><input id="bootUser" placeholder="admin"/></div>
+          <div class="col"><label>Display Name</label><input id="bootName" placeholder="Manager"/></div>
+          <div class="col"><label>PIN</label><input id="bootPin" type="password" placeholder="****"/></div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button id="btnBootstrap">Create First Admin</button>
+          <span id="bootMsg" class="badge"></span>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="card hidden" id="nightCard">
+    <h2 style="margin:0 0 10px;font-size:14px">Night</h2>
+    <div class="row">
+      <div class="col">
+        <label>Date (YYYY-MM-DD)</label>
+        <input id="nightDate" />
+      </div>
+      <div class="col">
+        <label>Night ID</label>
+        <input id="nightId" disabled />
+      </div>
+      <div class="col" style="display:flex;align-items:end">
+        <button class="primary" id="btnOpenNight">Open / Load Night</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARBACK -->
+  <div class="card hidden" id="barbackCard">
+    <h2 style="margin:0 0 10px;font-size:14px">پنل Barback (فقط ثبت رویداد)</h2>
+    <small>✅ فقط Event ثبت می‌شود. هیچ تغییر اصلی در دیتابیس انجام نمی‌شود مگر Admin تایید کند.</small>
+    <div class="row" style="margin-top:10px">
+      <div class="col">
+        <label>Bar</label>
+        <select id="bbBar"></select>
+      </div>
+      <div class="col">
+        <label>Station</label>
+        <select id="bbStation"></select>
+      </div>
+      <div class="col">
+        <label>Type</label>
+        <select id="bbType">
+          <option value="REQUEST">REQUEST (برداشت/درخواست)</option>
+          <option value="DELIVERED">DELIVERED (تحویل داده شد)</option>
+          <option value="RETURNED">RETURNED (برگشتی)</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label>Barcode (اسکن/تایپ)</label>
+        <input id="bbBarcode" placeholder="اسکن کن یا دستی وارد کن" />
+      </div>
+      <div class="col">
+        <label>Qty</label>
+        <input id="bbQty" type="number" min="1" value="1"/>
+      </div>
+      <div class="col">
+        <label>Note</label>
+        <input id="bbNote" placeholder="اختیاری"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
+      <button class="primary" id="btnSubmitEvent">Submit</button>
+      <span id="bbMsg" class="badge"></span>
+    </div>
+    <hr/>
+    <h3 style="margin:0 0 8px;font-size:13px">رویدادهای من (آخرین 300)</h3>
+    <div style="overflow:auto">
+      <table id="bbTable">
+        <thead><tr><th>زمان</th><th>نوع</th><th>بار/استیشن</th><th>آیتم</th><th>بارکد</th><th>Qty</th><th>Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="card hidden" id="adminCard">
+    <h2 style="margin:0 0 10px;font-size:14px">پنل Admin</h2>
+    <div class="row">
+      <div class="col">
+        <h3 style="margin:0 0 8px;font-size:13px">Items</h3>
+        <label>Name</label><input id="itName" placeholder="Vodka"/>
+        <label>Category</label><input id="itCat" placeholder="Spirits"/>
+        <label>Barcode (optional)</label><input id="itBar" placeholder="123456789"/>
+        <button id="btnAddItem" style="margin-top:10px">Add Item</button>
+        <div id="itMsg" class="badge" style="margin-top:10px"></div>
+      </div>
+
+      <div class="col">
+        <h3 style="margin:0 0 8px;font-size:13px">Bars & Stations</h3>
+        <label>Bar Name</label><input id="barName" placeholder="B1"/>
+        <button id="btnAddBar" style="margin-top:10px">Add Bar</button>
+
+        <label style="margin-top:12px">Station Bar</label><select id="stBar"></select>
+        <label>Station Name</label><input id="stName" placeholder="Bartender 1"/>
+        <button id="btnAddStation" style="margin-top:10px">Add Station</button>
+        <div id="bsMsg" class="badge" style="margin-top:10px"></div>
+      </div>
+
+      <div class="col">
+        <h3 style="margin:0 0 8px;font-size:13px">Users</h3>
+        <label>Username</label><input id="uUser" placeholder="barback1"/>
+        <label>Display Name</label><input id="uName" placeholder="Barback 1"/>
+        <label>PIN</label><input id="uPin" type="password" placeholder="****"/>
+        <label>Role</label>
+        <select id="uRole">
+          <option value="BARBACK">BARBACK</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+        <button id="btnAddUser" style="margin-top:10px">Add User</button>
+        <div id="uMsg" class="badge" style="margin-top:10px"></div>
+      </div>
+    </div>
+
+    <hr/>
+    <div class="row" style="align-items:end">
+      <div class="col">
+        <label>Filter Status</label>
+        <select id="evFilter">
+          <option value="">ALL</option>
+          <option value="PENDING">PENDING</option>
+          <option value="APPROVED">APPROVED</option>
+          <option value="REJECTED">REJECTED</option>
+        </select>
+      </div>
+      <div class="col">
+        <button class="primary" id="btnLoadEvents">Load Events</button>
+      </div>
+      <div class="col">
+        <span id="evMsg" class="badge"></span>
+      </div>
+    </div>
+
+    <div style="overflow:auto;margin-top:10px">
+      <table id="evTable">
+        <thead><tr>
+          <th>زمان</th><th>created by</th><th>نوع</th><th>بار/استیشن</th><th>آیتم</th><th>بارکد</th><th>Qty</th><th>Status</th><th>Action</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 8px;font-size:14px">Health</h2>
+    <button id="btnHealth">Check API</button>
+    <span id="healthMsg" class="badge"></span>
+  </div>
+</main>
+
+<script>
+const API = ""; // same origin
+let token = localStorage.getItem("inv_token") || "";
+let user = null;
+let night = { id: "", date_key: "" };
+let bars = [], stations = [], items = [];
+
+function $(id){ return document.getElementById(id); }
+
+function setMsg(el, text, ok=true){
+  el.textContent = text || "";
+  el.classList.remove("ok","err");
+  if(text) el.classList.add(ok ? "ok":"err");
+}
+
+function authHeaders(){
+  return token ? { "Authorization": "Bearer " + token } : {};
+}
+
+async function api(path, opts={}){
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { "Content-Type":"application/json", ...(opts.headers||{}), ...authHeaders() }
+  });
+  const data = await res.json().catch(()=> ({}));
+  if(!res.ok){
+    const err = (data && data.error) ? data.error : ("http_" + res.status);
+    throw new Error(err);
+  }
+  return data;
+}
+
+function show(el, on){ el.classList.toggle("hidden", !on); }
+
+function setBadge(){
+  if(user){
+    $("statusTxt").textContent = user.displayName + " (" + user.role + ")";
+  }else{
+    $("statusTxt").textContent = "خارج";
+  }
+  show($("btnLogout"), !!user);
+}
+
+function todayKey(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fillSelect(sel, arr, getLabel){
+  sel.innerHTML = "";
+  for(const x of arr){
+    const o = document.createElement("option");
+    o.value = x.id;
+    o.textContent = getLabel(x);
+    sel.appendChild(o);
+  }
+}
+
+function syncStationsForBar(barId){
+  const sts = stations.filter(s => s.bar_id === barId);
+  fillSelect($("bbStation"), sts, s => s.name);
+}
+
+async function loadCatalogs(){
+  const barResp = await api("/api/bars");
+  bars = barResp.bars || [];
+  stations = barResp.stations || [];
+  items = await api("/api/items");
+
+  fillSelect($("bbBar"), bars, b => b.name);
+  fillSelect($("stBar"), bars, b => b.name);
+
+  const firstBarId = (bars[0] && bars[0].id) || "";
+  if(firstBarId){
+    $("bbBar").value = firstBarId;
+    syncStationsForBar(firstBarId);
+    $("stBar").value = firstBarId;
+  }
+}
+
+async function openNight(){
+  const dateKey = $("nightDate").value.trim() || todayKey();
+  const n = await api("/api/night/open", { method:"POST", body: JSON.stringify({ dateKey })});
+  night = n;
+  $("nightId").value = n.id;
+  setMsg($("healthMsg"), "Night loaded: " + n.date_key, true);
+}
+
+async function renderMyEvents(){
+  if(!night.id) return;
+  const rows = await api("/api/events?nightId=" + encodeURIComponent(night.id));
+  const tbody = $("bbTable").querySelector("tbody");
+  tbody.innerHTML = "";
+  for(const e of rows){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${new Date(e.created_at).toLocaleString()}</td>
+      <td>${e.type}</td>
+      <td>${(e.bar_name||"")} / ${(e.station_name||"")}</td>
+      <td>${e.item_name || ""}</td>
+      <td>${e.barcode || ""}</td>
+      <td>${e.qty}</td>
+      <td>${e.status}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+async function renderAdminEvents(){
+  if(!night.id) return;
+  const st = $("evFilter").value;
+  const qs = new URLSearchParams({ nightId: night.id });
+  if(st) qs.set("status", st);
+  const rows = await api("/api/events?" + qs.toString());
+  const tbody = $("evTable").querySelector("tbody");
+  tbody.innerHTML = "";
+  for(const e of rows){
+    const tr = document.createElement("tr");
+    const actions = e.status === "PENDING" ? `
+      <button data-id="${e.id}" data-dec="APPROVED">Approve</button>
+      <button class="danger" data-id="${e.id}" data-dec="REJECTED">Reject</button>
+    ` : `<small>—</small>`;
+    tr.innerHTML = `
+      <td>${new Date(e.created_at).toLocaleString()}</td>
+      <td>${e.created_by_name || ""}</td>
+      <td>${e.type}</td>
+      <td>${(e.bar_name||"")} / ${(e.station_name||"")}</td>
+      <td>${e.item_name || ""}</td>
+      <td>${e.barcode || ""}</td>
+      <td>${e.qty}</td>
+      <td>${e.status}</td>
+      <td>${actions}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  tbody.querySelectorAll("button[data-id]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      const dec = btn.getAttribute("data-dec");
+      try{
+        await api("/api/admin/events/" + id + "/decision", { method:"POST", body: JSON.stringify({ decision: dec })});
+        setMsg($("evMsg"), "Updated: " + dec, true);
+        await renderAdminEvents();
+      }catch(e){
+        setMsg($("evMsg"), "Error: " + e.message, false);
+      }
+    });
+  });
+}
+
+async function afterLogin(){
+  show($("nightCard"), true);
+  $("nightDate").value = todayKey();
+  await loadCatalogs();
+  await openNight();
+
+  show($("loginCard"), false);
+
+  if(user.role === "ADMIN"){
+    show($("adminCard"), true);
+    show($("barbackCard"), false);
+  }else{
+    show($("adminCard"), false);
+    show($("barbackCard"), true);
+    await renderMyEvents();
+  }
+  setBadge();
+}
+
+$("btnLogin").addEventListener("click", async () => {
+  try{
+    setMsg($("loginMsg"), "در حال ورود...", true);
+    const username = $("loginUser").value.trim();
+    const pin = $("loginPin").value.trim();
+    const r = await api("/api/auth/login", { method:"POST", body: JSON.stringify({ username, pin })});
+    token = r.token;
+    user = r.user;
+    localStorage.setItem("inv_token", token);
+    setMsg($("loginMsg"), "OK", true);
+    await afterLogin();
+  }catch(e){
+    setMsg($("loginMsg"), "خطا: " + e.message, false);
+  }
+});
+
+$("btnLogout").addEventListener("click", () => {
+  token = "";
+  user = null;
+  localStorage.removeItem("inv_token");
+  location.reload();
+});
+
+$("btnBootstrap").addEventListener("click", async () => {
+  try{
+    setMsg($("bootMsg"), "در حال ساخت...", true);
+    const username = $("bootUser").value.trim();
+    const displayName = $("bootName").value.trim();
+    const pin = $("bootPin").value.trim();
+    await api("/api/admin/bootstrap", { method:"POST", body: JSON.stringify({ username, displayName, pin })});
+    setMsg($("bootMsg"), "ساخته شد. حالا Login کن.", true);
+  }catch(e){
+    setMsg($("bootMsg"), "خطا: " + e.message, false);
+  }
+});
+
+$("btnOpenNight").addEventListener("click", async () => {
+  try{
+    await openNight();
+    if(user?.role === "BARBACK") await renderMyEvents();
+  }catch(e){
+    setMsg($("healthMsg"), "Error: " + e.message, false);
+  }
+});
+
+$("bbBar").addEventListener("change", () => syncStationsForBar($("bbBar").value));
+
+$("btnSubmitEvent").addEventListener("click", async () => {
+  try{
+    if(!night.id) throw new Error("night_not_loaded");
+    const payload = {
+      nightId: night.id,
+      type: $("bbType").value,
+      barId: $("bbBar").value || null,
+      stationId: $("bbStation").value || null,
+      barcode: $("bbBarcode").value.trim() || null,
+      qty: Number($("bbQty").value || 1),
+      note: $("bbNote").value.trim() || null
+    };
+    setMsg($("bbMsg"), "در حال ارسال...", true);
+    await api("/api/events", { method:"POST", body: JSON.stringify(payload) });
+    setMsg($("bbMsg"), "ثبت شد (Pending).", true);
+    $("bbBarcode").value = "";
+    $("bbNote").value = "";
+    await renderMyEvents();
+  }catch(e){
+    setMsg($("bbMsg"), "خطا: " + e.message, false);
+  }
+});
+
+$("btnAddItem").addEventListener("click", async () => {
+  try{
+    const payload = { name: $("itName").value.trim(), category: $("itCat").value.trim() || null, barcode: $("itBar").value.trim() || null };
+    const r = await api("/api/admin/items", { method:"POST", body: JSON.stringify(payload) });
+    setMsg($("itMsg"), "Added: " + r.name, true);
+    $("itName").value = ""; $("itCat").value=""; $("itBar").value="";
+  }catch(e){
+    setMsg($("itMsg"), "خطا: " + e.message, false);
+  }
+});
+
+$("btnAddBar").addEventListener("click", async () => {
+  try{
+    const r = await api("/api/admin/bars", { method:"POST", body: JSON.stringify({ name: $("barName").value.trim() })});
+    setMsg($("bsMsg"), "Bar added: " + r.name, true);
+    $("barName").value = "";
+    await loadCatalogs();
+  }catch(e){
+    setMsg($("bsMsg"), "خطا: " + e.message, false);
+  }
+});
+
+$("btnAddStation").addEventListener("click", async () => {
+  try{
+    const payload = { barId: $("stBar").value, name: $("stName").value.trim() };
+    const r = await api("/api/admin/stations", { method:"POST", body: JSON.stringify(payload) });
+    setMsg($("bsMsg"), "Station added: " + r.name, true);
+    $("stName").value = "";
+    await loadCatalogs();
+  }catch(e){
+    setMsg($("bsMsg"), "خطا: " + e.message, false);
+  }
+});
+
+$("btnAddUser").addEventListener("click", async () => {
+  try{
+    const payload = { username: $("uUser").value.trim(), displayName: $("uName").value.trim(), pin: $("uPin").value.trim(), role: $("uRole").value };
+    const r = await api("/api/admin/users", { method:"POST", body: JSON.stringify(payload) });
+    setMsg($("uMsg"), "User added: " + r.username, true);
+    $("uUser").value=""; $("uName").value=""; $("uPin").value="";
+  }catch(e){
+    setMsg($("uMsg"), "خطا: " + e.message, false);
+  }
+});
+
+$("btnLoadEvents").addEventListener("click", async () => {
+  try{
+    setMsg($("evMsg"), "Loading...", true);
+    await renderAdminEvents();
+    setMsg($("evMsg"), "OK", true);
+  }catch(e){
+    setMsg($("evMsg"), "خطا: " + e.message, false);
+  }
+});
+
+$("btnHealth").addEventListener("click", async () => {
+  try{
+    const r = await api("/api/health");
+    setMsg($("healthMsg"), "OK: " + new Date(r.now).toLocaleString(), true);
+  }catch(e){
+    setMsg($("healthMsg"), "خطا: " + e.message, false);
+  }
+});
+
+// Auto-resume if token exists
+(async () => {
+  setBadge();
+  if(token){
+    try{
+      // lightweight check
+      await api("/api/health");
+      // we don't have /me endpoint; attempt login state by decoding is skipped; user must login again if needed
+      // For MVP: require re-login if token is present but user unknown
+      $("loginMsg").textContent = "توکن موجود است. لطفاً یکبار Login کن تا نقش مشخص شود.";
+    }catch(e){
+      localStorage.removeItem("inv_token");
+    }
+  }
+})();
+</script>
+</body>
+</html>
