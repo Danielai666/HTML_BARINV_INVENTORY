@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inventory MVP</title>
+<style>
+:root{
+  --bg:#0b1220;--card:#111a2e;--line:#203056;--muted:#a9b6d6;--text:#e8eefc;
+  --red:#ff2d55;--green:#26d07c;--btn:#1a2a52;--btn2:#2a3350;--yellow:#fbbf24;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#0a0f1d,#10162a 22%,#0b1220 100%);color:var(--text)}
+a{color:#9ec0ff}
+.wrap{max-width:1180px;margin:0 auto;padding:22px}
+.top{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);background:rgba(17,26,46,.7)}
+.badge b{color:var(--text)}
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:980px){.grid{grid-template-columns:1.15fr .85fr}}
+.card{border:1px solid var(--line);background:rgba(17,26,46,.9);border-radius:16px;padding:14px}
+h1{margin:0;font-size:20px}
+h2{margin:0 0 10px;font-size:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input,select,button,textarea{
+  background:#0c1528;border:1px solid var(--line);color:var(--text);
+  padding:10px 12px;border-radius:12px;outline:none;
+}
+input,select{min-width:200px}
+textarea{width:100%;min-height:70px}
+button{cursor:pointer;background:var(--btn)}
+button.secondary{background:transparent}
+button.good{background:rgba(38,208,124,.18);border-color:rgba(38,208,124,.35)}
+button.bad{background:rgba(255,45,85,.16);border-color:rgba(255,45,85,.35)}
+button.warn{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35)}
+hr{border:none;border-top:1px solid var(--line);margin:12px 0}
+.msg{margin-left:8px;font-size:13px}
+.msg.ok{color:var(--green)}
+.msg.err{color:var(--red)}
+.small{font-size:12px;color:var(--muted)}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+.table th{color:#dbe6ff;background:rgba(122,162,255,.08)}
+.pill{display:inline-block;border:1px solid var(--line);padding:3px 8px;border-radius:999px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Inventory MVP — Admin / Runner</h1>
+      <div class="small">English-only UI. Data is stored in PostgreSQL (shared across devices).</div>
+    </div>
+    <div class="row">
+      <span class="badge" id="statusBadge"><b>Status:</b> <span id="statusText">Signed out</span></span>
+      <button class="secondary" id="logoutBtn" style="display:none">Logout</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card" id="authCard">
+      <h2>Login</h2>
+      <div class="row">
+        <input id="loginUser" placeholder="Username (e.g. admin)" />
+        <input id="loginPin" placeholder="PIN" type="password" />
+        <button id="loginBtn">Login</button>
+        <span class="msg" id="loginMsg"></span>
+      </div>
+      <hr/>
+      <details>
+        <summary><b>Bootstrap (first-time only)</b> <span class="small">Create the first Admin</span></summary>
+        <div class="row" style="margin-top:10px">
+          <input id="bootUser" placeholder="Username" />
+          <input id="bootName" placeholder="Display name" />
+          <input id="bootPin" placeholder="PIN" type="password" />
+          <button class="warn" id="bootBtn">Create First Admin</button>
+          <span class="msg" id="bootMsg"></span>
+        </div>
+      </details>
+      <hr/>
+      <div class="row">
+        <button class="secondary" id="healthBtn">Check API</button>
+        <span class="msg" id="healthMsg"></span>
+      </div>
+    </div>
+
+    <div class="card" id="nightCard" style="display:none">
+      <h2>Session (Night)</h2>
+      <div class="row">
+        <input id="nightDate" placeholder="YYYY-MM-DD" />
+        <button class="good" id="openNightBtn">Open / Load</button>
+        <span class="msg" id="nightMsg"></span>
+      </div>
+      <div class="small">This sets the active session used for events.</div>
+    </div>
+  </div>
+
+  <div class="card" id="runnerCard" style="display:none;margin-top:14px">
+    <h2>Runner Tools (Basket → Apply → Confirm)</h2>
+    <div class="row">
+      <select id="evType">
+        <option value="DELIVERED">DELIVERED</option>
+        <option value="RETURNED">RETURNED</option>
+        <option value="REQUEST">REQUEST</option>
+      </select>
+      <select id="barSel"></select>
+      <select id="stationSel"></select>
+      <select id="itemSel"></select>
+      <input id="barcodeIn" placeholder="Barcode (optional)" />
+      <input id="qtyIn" type="number" min="1" value="1" style="width:110px;min-width:110px" />
+      <button id="addToBasketBtn">Add to Basket</button>
+      <span class="msg" id="basketMsg"></span>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <textarea id="noteIn" placeholder="Note (optional)"></textarea>
+    </div>
+
+    <hr/>
+    <div class="row" style="justify-content:space-between">
+      <div class="row">
+        <span class="pill" id="basketCount">0 items</span>
+        <button class="secondary" id="clearBasketBtn">Clear</button>
+      </div>
+      <div class="row">
+        <button class="good" id="applyBasketBtn">Apply Basket</button>
+      </div>
+    </div>
+
+    <div style="overflow:auto;margin-top:10px">
+      <table class="table" id="basketTable">
+        <thead><tr><th>Type</th><th>Bar</th><th>Station</th><th>Item</th><th>Barcode</th><th>Qty</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="small">Apply will ask for confirmation, then submit events. Events become PENDING until Admin approves (audit safe).</div>
+  </div>
+
+  <div class="card" id="adminCard" style="display:none;margin-top:14px">
+    <h2>Admin Panel</h2>
+    <div class="row">
+      <div class="badge"><b>Role:</b> <span id="roleText">—</span></div>
+    </div>
+    <hr/>
+
+    <h3 style="margin:0 0 10px">Users</h3>
+    <div class="row">
+      <input id="newUser" placeholder="Username" />
+      <input id="newName" placeholder="Display name" />
+      <input id="newPin" placeholder="PIN" type="password" />
+      <select id="newRole" style="min-width:170px">
+        <option value="BARBACK">RUNNER</option>
+        <option value="ADMIN">ADMIN</option>
+      </select>
+      <button id="addUserBtn">Add User</button>
+      <span class="msg" id="userMsg"></span>
+    </div>
+
+    <hr/>
+    <h3 style="margin:0 0 10px">Bars & Stations</h3>
+    <div class="row">
+      <input id="barName" placeholder="Area name (bar/zone)" />
+      <button id="addBarBtn">Add Area</button>
+      <span class="msg" id="barMsg"></span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <select id="stationBarSel"></select>
+      <input id="stationName" placeholder="Station name" />
+      <button id="addStationBtn">Add Station</button>
+      <span class="msg" id="stationMsg"></span>
+    </div>
+
+    <hr/>
+    <h3 style="margin:0 0 10px">Items (Show/Hide without deleting)</h3>
+    <div class="row">
+      <input id="itemName" placeholder="Item name" />
+      <input id="itemCat" placeholder="Category" />
+      <input id="itemBarcode" placeholder="Barcode (optional)" />
+      <button id="addItemBtn">Add Item</button>
+      <span class="msg" id="itemMsg"></span>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <select id="itemFilter" style="min-width:220px">
+        <option value="active">Active only</option>
+        <option value="hidden">Hidden only</option>
+        <option value="all">All</option>
+      </select>
+      <input id="itemSearch" placeholder="Search items..." style="min-width:260px" />
+      <button class="secondary" id="refreshItemsBtn">Refresh</button>
+    </div>
+    <div style="overflow:auto;margin-top:10px;max-height:340px">
+      <table class="table" id="itemsTable">
+        <thead><tr><th>Name</th><th>Category</th><th>Barcode</th><th>Active</th><th>Reason</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <hr/>
+    <h3 style="margin:0 0 10px">Events</h3>
+    <div class="row">
+      <button class="secondary" id="loadEventsBtn">Load Events</button>
+      <select id="statusFilter" style="min-width:210px">
+        <option value="ALL">All</option>
+        <option value="PENDING">Pending</option>
+        <option value="APPROVED">Approved</option>
+        <option value="REJECTED">Rejected</option>
+      </select>
+      <span class="msg" id="eventsMsg"></span>
+    </div>
+    <div style="overflow:auto;margin-top:10px;max-height:360px">
+      <table class="table" id="eventsTable">
+        <thead><tr><th>Time</th><th>Status</th><th>Type</th><th>Bar</th><th>Station</th><th>Item/Barcode</th><th>Qty</th><th>By</th><th>Decision</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = ""; // same origin
+let token = localStorage.getItem("inv_token") || "";
+let me = null;
+let night = null;
+let bars = [], stations = [], items = [];
+let basket = [];
+
+function $(id){ return document.getElementById(id); }
+function setBadge(text){ $("statusText").textContent = text; }
+function setMsg(el, text, ok=true){
+  el.textContent = text || "";
+  el.classList.remove("ok","err");
+  if(text) el.classList.add(ok ? "ok":"err");
+}
+function authHeaders(){ return token ? { "Authorization":"Bearer " + token } : {}; }
+
+async function api(path, opts={}){
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { "Content-Type":"application/json", ...(opts.headers||{}), ...authHeaders() }
+  });
+  const data = await res.json().catch(()=> ({}));
+  if(!res.ok){
+    const err = data && data.error ? data.error : ("http_" + res.status);
+    throw new Error(err);
+  }
+  return data;
+}
+
+function logout(){
+  token = "";
+  me = null;
+  night = null;
+  localStorage.removeItem("inv_token");
+  $("logoutBtn").style.display = "none";
+  $("nightCard").style.display = "none";
+  $("runnerCard").style.display = "none";
+  $("adminCard").style.display = "none";
+  $("authCard").style.display = "";
+  setBadge("Signed out");
+}
+$("logoutBtn").onclick = logout;
+
+async function refreshMe(){
+  if(!token){ logout(); return; }
+  try{
+    me = await api("/api/auth/me");
+    $("authCard").style.display = "none";
+    $("logoutBtn").style.display = "";
+    $("nightCard").style.display = "";
+    setBadge(me.display_name + " (" + me.role + ")");
+    $("roleText").textContent = me.role;
+
+    const isAdmin = me.role === "ADMIN";
+    $("adminCard").style.display = isAdmin ? "" : "none";
+    $("runnerCard").style.display = isAdmin ? "" : ""; // runner tools for everyone logged-in
+
+    await loadBarsStationsItems();
+    if(me && me.role === "ADMIN") renderItemsTable();
+  }catch(e){
+    logout();
+  }
+}
+
+async function loadCatalog(){
+  bars = await api("/api/bars");
+  stations = await api("/api/bars").then(()=>api("/api/bars")).catch(()=>[]);
+  // stations loaded via bars endpoint? We'll load via /api/bars and server returns stations separately in /api/bars? If not, keep below:
+  try{
+    stations = await api("/api/bars").then(()=>[]); // placeholder; real stations loaded from /api/bars isn't provided
+  }catch{}
+  // Real endpoints in this MVP:
+  stations = await api("/api/bars").then(()=>[]).catch(()=>[]);
+}
+
+async function loadBarsStationsItems(){
+  bars = await api("/api/bars");
+  // stations list is not available directly; we can infer via events or extend later. For now, use bars + station selector from /api/bars in server: it returns bars only.
+  // However server has /api/bars and /api/admin/stations (create). We'll add a /api/stations route later; for now, rely on /api/bars returning bars and add /api/stations in backend soon.
+  try{
+    stations = await api("/api/stations");
+  }catch(e){
+    stations = [];
+  }
+  items = await api("/api/items");
+  renderSelectors();
+}
+
+function renderSelectors(){
+  function fill(sel, list, labelFn){
+    sel.innerHTML = "";
+    list.forEach(x=>{
+      const o=document.createElement("option");
+      o.value=x.id; o.textContent=labelFn(x);
+      sel.appendChild(o);
+    });
+  }
+  fill($("barSel"), bars, b=>b.name);
+  fill($("stationBarSel"), bars, b=>b.name);
+  fill($("stationSel"), stations, s=> {
+    const bar = bars.find(b=>b.id===s.bar_id);
+    return (bar?bar.name+" / ":"") + s.name;
+  });
+  fill($("itemSel"), items, it=>it.name);
+}
+
+function renderBasket(){
+  $("basketCount").textContent = basket.length + " items";
+  const tb = $("basketTable").querySelector("tbody");
+  tb.innerHTML = "";
+  basket.forEach((x, idx)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML = `
+      <td>${x.type}</td>
+      <td>${x.bar_name||""}</td>
+      <td>${x.station_name||""}</td>
+      <td>${x.item_name||""}</td>
+      <td>${x.barcode||""}</td>
+      <td>${x.qty}</td>
+      <td><button class="secondary" data-i="${idx}">Remove</button></td>
+    `;
+    tr.querySelector("button").onclick = ()=>{ basket.splice(idx,1); renderBasket(); };
+    tb.appendChild(tr);
+  });
+}
+
+$("addToBasketBtn").onclick = ()=>{
+  setMsg($("basketMsg"), "");
+  const type = $("evType").value;
+  const barId = $("barSel").value || null;
+  const stationId = $("stationSel").value || null;
+  const itemId = $("itemSel").value || null;
+  const barcode = ($("barcodeIn").value||"").trim() || null;
+  const qty = Math.max(1, parseInt($("qtyIn").value||"1",10));
+  const note = ($("noteIn").value||"").trim() || null;
+
+  const bar = bars.find(b=>b.id===barId);
+  const station = stations.find(s=>s.id===stationId);
+  const item = items.find(i=>i.id===itemId);
+
+  basket.push({
+    type,
+    bar_id: barId,
+    station_id: stationId,
+    item_id: itemId,
+    barcode,
+    qty,
+    note,
+    bar_name: bar?bar.name:"",
+    station_name: station?station.name:"",
+    item_name: item?item.name:""
+  });
+  renderBasket();
+  setMsg($("basketMsg"), "Added.", true);
+};
+
+$("clearBasketBtn").onclick = ()=>{ basket=[]; renderBasket(); };
+
+$("applyBasketBtn").onclick = async ()=>{
+  if(!night || !night.id){
+    setMsg($("basketMsg"), "Open a session first.", false); return;
+  }
+  if(!basket.length){
+    setMsg($("basketMsg"), "Basket is empty.", false); return;
+  }
+  const summary = basket.map(x=>`${x.type} ${x.item_name||x.barcode||"item"} x${x.qty}`).join("\n");
+  const ok = confirm("Confirm to submit these events?\n\n" + summary);
+  if(!ok) return;
+
+  try{
+    for(const x of basket){
+      await api("/api/events", {
+        method:"POST",
+        body: JSON.stringify({
+          night_id: night.id,
+          type: x.type,
+          bar_id: x.bar_id,
+          station_id: x.station_id,
+          item_id: x.item_id,
+          barcode: x.barcode,
+          qty: x.qty,
+          note: x.note
+        })
+      });
+    }
+    basket=[];
+    renderBasket();
+    setMsg($("basketMsg"), "Submitted. Waiting for Admin approval.", true);
+  }catch(e){
+    setMsg($("basketMsg"), String(e.message||e), false);
+  }
+};
+
+$("healthBtn").onclick = async ()=>{
+  try{
+    const r = await api("/api/health", { headers:{} });
+    setMsg($("healthMsg"), "OK: " + new Date().toLocaleString(), true);
+  }catch(e){
+    setMsg($("healthMsg"), String(e.message||e), false);
+  }
+};
+
+$("bootBtn").onclick = async ()=>{
+  const username = ($("bootUser").value||"").trim();
+  const display_name = ($("bootName").value||"").trim();
+  const pin = ($("bootPin").value||"").trim();
+  try{
+    const r = await api("/api/admin/bootstrap", { method:"POST", body: JSON.stringify({ username, display_name, pin }) });
+    setMsg($("bootMsg"), "Admin created. You can login now.", true);
+  }catch(e){
+    setMsg($("bootMsg"), String(e.message||e), false);
+  }
+};
+
+$("loginBtn").onclick = async ()=>{
+  const username = ($("loginUser").value||"").trim();
+  const pin = ($("loginPin").value||"").trim();
+  try{
+    const r = await api("/api/auth/login", { method:"POST", body: JSON.stringify({ username, pin }) });
+    token = r.token;
+    localStorage.setItem("inv_token", token);
+    setMsg($("loginMsg"), "Logged in.", true);
+    await refreshMe();
+  }catch(e){
+    setMsg($("loginMsg"), String(e.message||e), false);
+  }
+};
+
+$("openNightBtn").onclick = async ()=>{
+  const date_key = ($("nightDate").value||"").trim();
+  if(!date_key){ setMsg($("nightMsg"), "Enter date (YYYY-MM-DD).", false); return; }
+  try{
+    night = await api("/api/night/open", { method:"POST", body: JSON.stringify({ date_key }) });
+    setMsg($("nightMsg"), "Loaded: " + night.date_key, true);
+  }catch(e){
+    setMsg($("nightMsg"), String(e.message||e), false);
+  }
+};
+
+$("addUserBtn").onclick = async ()=>{
+  try{
+    const username = ($("newUser").value||"").trim();
+    const display_name = ($("newName").value||"").trim();
+    const pin = ($("newPin").value||"").trim();
+    const role = $("newRole").value;
+    await api("/api/admin/users", { method:"POST", body: JSON.stringify({ username, display_name, pin, role }) });
+    setMsg($("userMsg"), "User added.", true);
+  }catch(e){
+    setMsg($("userMsg"), String(e.message||e), false);
+  }
+};
+
+$("addBarBtn").onclick = async ()=>{
+  try{
+    const name = ($("barName").value||"").trim();
+    await api("/api/admin/bars", { method:"POST", body: JSON.stringify({ name }) });
+    setMsg($("barMsg"), "Area added.", true);
+    await loadBarsStationsItems();
+  }catch(e){
+    setMsg($("barMsg"), String(e.message||e), false);
+  }
+};
+
+$("addStationBtn").onclick = async ()=>{
+  try{
+    const bar_id = $("stationBarSel").value;
+    const name = ($("stationName").value||"").trim();
+    await api("/api/admin/stations", { method:"POST", body: JSON.stringify({ bar_id, name }) });
+    setMsg($("stationMsg"), "Station added.", true);
+    await loadBarsStationsItems();
+  }catch(e){
+    setMsg($("stationMsg"), String(e.message||e), false);
+  }
+};
+
+$("addItemBtn").onclick = async ()=>{
+  try{
+    const name = ($("itemName").value||"").trim();
+    const category = ($("itemCat").value||"").trim() || null;
+    const barcode = ($("itemBarcode").value||"").trim() || null;
+    await api("/api/admin/items", { method:"POST", body: JSON.stringify({ name, category, barcode }) });
+    setMsg($("itemMsg"), "Item added.", true);
+    await loadBarsStationsItems();
+    if(me && me.role==="ADMIN") renderItemsTable();
+  }catch(e){
+    setMsg($("itemMsg"), String(e.message||e), false);
+  }
+};
+
+$("refreshItemsBtn").onclick = async ()=>{ await loadBarsStationsItems(); if(me && me.role==="ADMIN") renderItemsTable(); };
+
+function renderItemsTable(){
+  const filter = $("itemFilter").value;
+  const q = ($("itemSearch").value||"").trim().toLowerCase();
+  const tb = $("itemsTable").querySelector("tbody");
+  tb.innerHTML = "";
+  const list = items.filter(it=>{
+    if(filter==="active" && it.is_active===false) return false;
+    if(filter==="hidden" && it.is_active!==false) return false;
+    if(q && !(it.name||"").toLowerCase().includes(q) && !((it.barcode||"").toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  list.forEach(it=>{
+    const tr=document.createElement("tr");
+    const active = it.is_active !== false;
+    tr.innerHTML = `
+      <td>${it.name||""}</td>
+      <td>${it.category||""}</td>
+      <td>${it.barcode||""}</td>
+      <td>${active ? "YES":"NO"}</td>
+      <td><input data-r="reason" value="${it.inactive_reason||""}" placeholder="Reason (optional)" style="min-width:220px"/></td>
+      <td>
+        <button class="${active?'warn':'good'}" data-a="${active?'hide':'show'}">${active?'Hide':'Show'}</button>
+      </td>
+    `;
+    tr.querySelector("button").onclick = async ()=>{
+      const reason = tr.querySelector('input[data-r="reason"]').value || null;
+      try{
+        await api("/api/admin/items/" + it.id, { method:"PATCH", body: JSON.stringify({ is_active: !active, inactive_reason: reason }) });
+        await loadBarsStationsItems();
+        renderItemsTable();
+      }catch(e){
+        alert("Failed: " + (e.message||e));
+      }
+    };
+    tb.appendChild(tr);
+  });
+}
+
+$("itemFilter").onchange = ()=>{ if(me && me.role==="ADMIN") renderItemsTable(); };
+$("itemSearch").oninput = ()=>{ if(me && me.role==="ADMIN") renderItemsTable(); };
+
+$("loadEventsBtn").onclick = async ()=>{ await loadEvents(); };
+
+async function loadEvents(){
+  if(!night || !night.id){ setMsg($("eventsMsg"), "Open a session first.", false); return; }
+  try{
+    const status = $("statusFilter").value;
+    const list = await api("/api/events?night_id="+encodeURIComponent(night.id)+"&status="+encodeURIComponent(status));
+    renderEventsTable(list);
+    setMsg($("eventsMsg"), "Loaded " + list.length, true);
+  }catch(e){
+    setMsg($("eventsMsg"), String(e.message||e), false);
+  }
+}
+
+function renderEventsTable(list){
+  const tb = $("eventsTable").querySelector("tbody");
+  tb.innerHTML = "";
+  list.forEach(ev=>{
+    const tr=document.createElement("tr");
+    const itemName = ev.item_name || ev.barcode || "";
+    tr.innerHTML = `
+      <td>${new Date(ev.created_at).toLocaleString()}</td>
+      <td>${ev.status}</td>
+      <td>${ev.type}</td>
+      <td>${ev.bar_name||""}</td>
+      <td>${ev.station_name||""}</td>
+      <td>${itemName}</td>
+      <td>${ev.qty}</td>
+      <td>${ev.created_by_name||ev.created_by||""}</td>
+      <td></td>
+    `;
+    const td = tr.lastElementChild;
+    if(me && me.role==="ADMIN" && ev.status==="PENDING"){
+      const a=document.createElement("button"); a.textContent="Approve"; a.className="good";
+      const r=document.createElement("button"); r.textContent="Reject"; r.className="bad";
+      a.onclick = ()=>decision(ev.id,"APPROVE");
+      r.onclick = ()=>decision(ev.id,"REJECT");
+      td.appendChild(a); td.appendChild(r);
+    }else{
+      td.textContent = ev.status;
+    }
+    tb.appendChild(tr);
+  });
+}
+
+async function decision(id, action){
+  try{
+    await api("/api/admin/events/"+id+"/decision", { method:"POST", body: JSON.stringify({ action }) });
+    await loadEvents();
+  }catch(e){
+    alert("Failed: " + (e.message||e));
+  }
+}
+
+// Init
+(function init(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  $("nightDate").value = `${yyyy}-${mm}-${dd}`;
+  if(token) refreshMe();
+})();
+</script>
+</body>
+</html>

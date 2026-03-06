@@ -1,0 +1,3843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inventory Clicker</title>
+<style>
+:root{
+  --bg:#0b1220; --card:#111a2e; --line:#203056; --muted:#a9b6d6; --text:#e8eefc;
+  --btn:#0c1528; --btn2:#2a3350; --red:#ff2d55; --green:#26d07c; --blue:#1a3cff;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
+header{padding:14px 16px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+h1{margin:0;font-size:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px;}
+.wrap{max-width:1200px;margin:0 auto;padding:16px;}
+.grid{display:grid;gap:12px;grid-template-columns:1fr;}
+@media(min-width:980px){.grid{grid-template-columns:1.35fr 0.65fr;}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px;}
+input,button,select,textarea{
+  border-radius:12px;border:1px solid #2a3d6b;background:var(--btn);color:var(--text);
+  padding:10px 12px;font-size:14px;
+}
+textarea{min-height:90px;resize:vertical;line-height:1.35}
+button{cursor:pointer;}
+.btnRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.btnGray{background:var(--btn2);}
+.btnRed{background:var(--red);border-color:var(--red);}
+.btnBlue{background:var(--blue);border-color:var(--blue);}
+.btnGreen{background:var(--green);border-color:var(--green);color:#08120d;}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;}
+.tab{padding:10px 12px;border-radius:999px;border:1px solid #2a3d6b;background:var(--btn);cursor:pointer;user-select:none;}
+.tab.active{background:#162652;border-color:#3352aa;}
+.subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.subtab{padding:8px 10px;border-radius:999px;border:1px solid #2a3d6b;background:#0d1630;cursor:pointer;user-select:none;font-size:13px;}
+.subtab.active{background:#1a2d62;border-color:#3b64d6;}
+.items{display:grid;gap:10px;grid-template-columns:1fr;}
+@media(min-width:700px){.items{grid-template-columns:1fr 1fr;}}
+@media(min-width:1100px){.items{grid-template-columns:1fr 1fr 1fr;}}
+.itemCard{background:#0d1630;border:1px solid #22325b;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.itemTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+.itemName{font-weight:800;font-size:14px;}
+.countBox{min-width:70px;text-align:center;background:#0b1220;border:1px solid #22325b;border-radius:12px;padding:8px;}
+.countBox .net{font-size:18px;font-weight:900;line-height:1.1;}
+.countBox .sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.pm{display:flex;gap:8px;width:100%;}
+.pm button{flex:1;font-weight:900;font-size:18px;padding:10px;}
+.minus{background:#2b1a2a;border-color:#5b2b4c;}
+.plus{background:#132a1f;border-color:#1f6a46;}
+.muted{color:var(--muted);font-size:12px;}
+.small{font-size:12px;}
+.log{max-height:360px;overflow:auto;border:1px solid #22325b;border-radius:12px;margin-top:10px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{border-bottom:1px solid #22325b;padding:10px 6px;text-align:left;vertical-align:top;}
+th{color:var(--muted);font-weight:600;}
+.right{text-align:right;}
+.toast{margin-top:10px;font-size:12px;color:var(--muted);}
+.stationMeta{margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;}
+.metaPill{padding:4px 10px;border-radius:999px;border:1px solid #22325b;background:#0b1220;color:var(--muted);font-size:12px;}
+hr{border:none;border-top:1px solid #22325b;margin:14px 0}
+.kbd{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  padding:2px 6px;border:1px solid #22325b;border-radius:8px;background:#0b1220;color:var(--muted);font-size:12px;
+}
+
+/* Setup modal */
+.modalBackdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-start;justify-content:center;padding:18px;z-index:50;}
+.modal{width:min(980px, 100%);max-height:90vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;}
+.row{display:grid;gap:10px;grid-template-columns:1fr}
+@media(min-width:860px){.row{grid-template-columns:1fr 1fr}}
+.box{border:1px solid #22325b;border-radius:14px;padding:12px;background:#0d1630;}
+.flex{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.rightFlex{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.miniBtn{padding:8px 10px;font-size:13px;border-radius:999px}
+.badge{padding:4px 10px;border-radius:999px;border:1px solid #22325b;background:#0b1220;color:var(--muted);font-size:12px;}
+.stGrid{display:grid;gap:10px}
+.stCard{border:1px solid #22325b;border-radius:14px;padding:12px;background:#0b1220}
+.stCard h3{margin:0 0 10px 0;font-size:13px;color:var(--muted);font-weight:700}
+.stCard .fields{display:grid;gap:8px;grid-template-columns:1fr}
+@media(min-width:860px){.stCard .fields{grid-template-columns:1fr 1fr}}
+.help{font-size:12px;color:var(--muted);line-height:1.35}
+.itemRow{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid #22325b;border-radius:14px;padding:10px 12px;background:#0b1220}
+.itemRow .name{font-weight:700}
+.itemRow .actions{display:flex;gap:8px;align-items:center}
+.itemRow .mini{padding:8px 10px;border-radius:999px;font-size:13px}
+
+/* ── NEW FEATURES CSS ── */
+.btnAmber{background:#9a5c00;border-color:#9a5c00;color:#fff;}
+.btnTeal{background:#0a7a62;border-color:#0a7a62;color:#fff;}
+.grouptab{padding:10px 16px;border-radius:999px;border:2px solid #2a3d6b;background:var(--btn);
+  cursor:pointer;user-select:none;font-weight:800;font-size:14px;}
+.grouptab.active{background:#1a2d62;border-color:#3b64d6;color:#fff;}
+.parBadge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:999px;
+  border:1px solid rgba(255,180,64,.5);color:#ffb340;background:rgba(255,180,64,.1);
+  margin-left:6px;font-weight:700;vertical-align:middle;}
+.itemCard.over-par{border-color:rgba(255,180,64,.5);}
+.stCheck{display:flex;gap:10px;align-items:center;border:1px solid #22325b;
+  border-radius:12px;padding:10px 12px;background:#0b1220;cursor:pointer;user-select:none;}
+.stCheck input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);flex-shrink:0;}
+.archCard{border:1px solid #22325b;border-radius:14px;padding:12px;background:#0b1220;
+  cursor:pointer;transition:border-color .15s;}
+.archCard:hover{border-color:#3352aa;}
+.groupCard{border:2px solid #3b64d6;border-radius:14px;padding:14px;background:#0d1630;margin-bottom:12px;}
+.groupCardHead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+
+/* ── WAREHOUSE MODULE CSS ── */
+.wh-wrap{max-width:1200px;margin:0 auto;padding:16px;}
+.wh-catTab{padding:10px 18px;border-radius:999px;border:2px solid #2a3d6b;background:var(--btn);
+  cursor:pointer;user-select:none;font-weight:800;font-size:14px;position:relative;}
+.wh-catTab.active{background:#1a2d62;border-color:#3b64d6;color:#fff;}
+.wh-catTab .wh-lowBadge{position:absolute;top:-4px;right:-4px;background:#ff2d55;
+  color:#fff;font-size:10px;font-weight:900;padding:1px 5px;border-radius:999px;min-width:16px;text-align:center;}
+.wh-itemCard{background:#0d1630;border:1px solid #22325b;border-radius:14px;padding:14px;
+  display:flex;flex-direction:column;gap:10px;}
+.wh-itemCard.wh-low{border-color:rgba(255,45,85,.5);}
+.wh-itemCard.wh-ok{border-color:rgba(38,208,124,.25);}
+.wh-stockBox{min-width:80px;text-align:center;background:#0b1220;border:1px solid #22325b;
+  border-radius:12px;padding:8px;}
+.wh-stockNum{font-size:22px;font-weight:900;line-height:1;}
+.wh-stockSub{font-size:11px;color:var(--muted);margin-top:3px;}
+.wh-lowAlert{font-size:11px;color:#ff2d55;font-weight:700;margin-top:2px;}
+.wh-pm{display:flex;gap:8px;width:100%;}
+.wh-pm button{flex:1;font-weight:900;font-size:18px;padding:10px;border-radius:12px;border:1px solid #2a3d6b;}
+.wh-minus{background:#2b1a2a;border-color:#5b2b4c;}
+.wh-plus{background:#132a1f;border-color:#1f6a46;}
+.wh-form{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+.wh-sizePreset{padding:6px 12px;border-radius:999px;border:1px solid #2a3d6b;background:var(--btn);
+  cursor:pointer;font-size:13px;font-weight:700;}
+.wh-sizePreset.active{background:#162652;border-color:#3352aa;}
+.wh-transferLog{max-height:220px;overflow:auto;border:1px solid #22325b;border-radius:12px;margin-top:8px;}
+
+/* ── BARCODE SCANNER CSS ── */
+.bc-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  background:#0d1630;border:1px solid #22325b;border-radius:14px;padding:12px;margin-bottom:14px;}
+.bc-input{flex:1;min-width:160px;font-size:15px;font-weight:700;letter-spacing:2px;
+  background:#0b1220;border:2px solid #2a3d6b;border-radius:10px;padding:10px 14px;}
+.bc-input.bc-active{border-color:#26d07c;box-shadow:0 0 0 3px rgba(38,208,124,.15);}
+.bc-input.bc-found{border-color:#1a3cff;background:rgba(26,60,255,.1);}
+.bc-input.bc-notfound{border-color:#ff2d55;background:rgba(255,45,85,.1);}
+.bc-status{font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;
+  border:1px solid #22325b;background:#0b1220;}
+.bc-status.bc-ok{color:#26d07c;border-color:#26d07c;}
+.bc-status.bc-err{color:#ff2d55;border-color:#ff2d55;}
+.bc-status.bc-warn{color:#ffb340;border-color:#ffb340;}
+/* action popup */
+.bc-popup{background:var(--card);border:1px solid #3b64d6;border-radius:16px;
+  padding:16px;margin-bottom:14px;animation:bcFadeIn .15s ease;}
+@keyframes bcFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.bc-itemTitle{font-size:16px;font-weight:900;margin-bottom:4px;}
+.bc-actionGrid{display:grid;gap:8px;grid-template-columns:1fr 1fr 1fr;margin-top:12px;}
+.bc-actionBtn{padding:14px 10px;border-radius:14px;border:1px solid #2a3d6b;
+  font-size:13px;font-weight:800;cursor:pointer;text-align:center;}
+.bc-in  {background:#132a1f;border-color:#1f6a46;color:#26d07c;}
+.bc-out {background:#2b1a2a;border-color:#5b2b4c;color:#ff2d55;}
+.bc-trn {background:#1a1a3a;border-color:#3b64d6;color:#9fd3ff;}
+/* camera overlay */
+.bc-camOverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+#bc-video{width:min(400px,95vw);border-radius:14px;border:3px solid #1a3cff;}
+.bc-camClose{padding:12px 28px;border-radius:999px;background:#ff2d55;
+  border:none;color:#fff;font-weight:800;font-size:16px;cursor:pointer;}
+.bc-scanLine{width:min(400px,95vw);height:3px;background:linear-gradient(90deg,transparent,#1a3cff,transparent);
+  animation:scanMove 1.5s linear infinite;}
+@keyframes scanMove{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+/* ── NAVIGATOR (accordion) ── */
+.navGroup{border:1px solid #22325b;border-radius:14px;background:#0d1630;overflow:hidden;}
+.navHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;}
+.navHead:hover{border-color:#3352aa}
+.navTitle{font-weight:900;font-size:14px;}
+.navSub{color:var(--muted);font-size:12px;}
+.navChevron{color:var(--muted);font-weight:900;}
+.navBody{display:none;padding:0 12px 12px 12px;}
+.navRow{display:flex;justify-content:space-between;gap:10px;align-items:center;
+  border:1px solid #22325b;border-radius:12px;background:#0b1220;padding:10px 12px;margin-top:8px;
+  cursor:pointer;user-select:none;}
+.navRow:hover{border-color:#3352aa}
+.navRow .left{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.navRow .top{font-weight:800;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.navRow .bot{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.navRow .pill{font-size:11px;border-radius:999px;border:1px solid #22325b;background:#0d1630;padding:4px 10px;color:var(--muted);}
+.navRow.active{border-color:#3b64d6;box-shadow:0 0 0 2px rgba(59,100,214,.15) inset;}
+</style>
+<script>
+/* ZXing loader: tries multiple CDNs (helps when one is blocked). */
+(function(){
+  const urls = [
+    "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js",
+    "https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js",
+    "https://cdn.jsdelivr.net/npm/@zxing/library@0.21.2/umd/index.min.js",
+    "https://unpkg.com/@zxing/library@0.21.2/umd/index.min.js"
+  ];
+  let i = 0;
+  function tryNext(){
+    if(window.ZXing || window.ZXingBrowser) return;
+    if(i >= urls.length) return;
+    const s = document.createElement("script");
+    s.src = urls[i++];
+    s.async = true;
+    s.onload = ()=>{ /* loaded */ };
+    s.onerror = ()=>{ tryNext(); };
+    document.head.appendChild(s);
+  }
+  tryNext();
+})();
+</script>
+</head>
+<body>
+<header>
+  <h1>
+    🍾 Inventory Clicker
+    <span class="pill" id="nightPill"></span>
+    <span class="pill">General template (add bars & staff as needed)</span>
+  </h1>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;">
+        <div class="muted">
+          Pick Bar ➜ Pick Station ➜ tap <b>+</b> (taken) or <b>−</b> (returned).
+          <span class="kbd">Setup</span> lets you add bars and bartenders for each night.
+        </div>
+        <div class="btnRow">
+          <button id="setupBtn" class="btnGray">⚙️ Setup</button>
+          <button id="startNightBtn" class="btnGray">🧾 Start Night</button>
+          <button id="lockBtn" class="btnGray">🔓 Unlocked</button>
+          <button id="undoBtn" class="btnGray">↩️ Undo</button>
+          <button id="exportSheetBtn" class="btnBlue">⬇️ Export “Sheet Style” CSV</button>
+          <button id="exportReportBtn" class="btnBlue">🖨️ Export Report (HTML)</button>
+          <button id="exportLogBtn" class="btnBlue">⬇️ Export LOG</button>
+          <button id="exportBarSummaryBtn" class="btnBlue">📊 Bar Summary</button>
+          <button id="exportVarianceBtn"   class="btnAmber">📈 Variance</button>
+          <button id="exportAllNightsBtn"  class="btnTeal">🌐 All Nights CSV</button>
+          <button id="historyBtn"          class="btnGray">🕐 History</button>
+          <button id="compareBtn"          class="btnGray">↔️ Compare</button>
+          <button id="bulkApplyBtn"        class="btnGray">🎯 Bulk Apply</button>
+          <button id="warehouseBtn" class="btnGray" style="border-color:#6b4fa0;background:#1a0f2e;">🏭 Warehouse</button>
+          <button id="resetBtn" class="btnRed">🧨 Reset Night</button>
+        </div>
+      </div>
+
+            <label>Navigator</label>
+      <div class="flex" style="gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+        <select id="navMode" style="min-width:190px;">
+          <option value="bar">Group: Bar</option>
+          <option value="bartender">Group: Bartender</option>
+          <option value="barback">Group: Barback</option>
+          <option value="placement">Group: Placement</option>
+          <option value="group">Group: Group</option>
+        </select>
+        <input id="navSearch" placeholder="Find bar / bartender / barback / placement…" style="flex:1;min-width:220px;" />
+      </div>
+      <div id="navList" class="stGrid" style="grid-template-columns:1fr;gap:10px;"></div>
+
+      <div style="display:none">
+        <label>Groups</label>
+        <div class="tabs" id="groupTabs" style="gap:6px;"></div>
+
+        <label>Bars</label>
+        <div class="tabs" id="sectionTabs" style="gap:6px;"></div>
+
+        <label>Stations (Bartenders)</label>
+        <div class="subtabs" id="stationTabs"></div>
+      </div>
+
+      <div id="stationMeta" class="stationMeta"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 140px;gap:10px;margin-top:10px;">
+        <div>
+          <label>Quick Search Item</label>
+          <input id="search" placeholder="Type to filter items…" />
+        </div>
+        <div>
+          <label>Qty</label>
+          <input id="qty" type="number" min="1" step="1" value="1" />
+        </div>
+      </div>
+
+      <label style="margin-top:14px;">Items for <span id="where"></span></label>
+      <div class="items" id="items"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <div class="card">
+      <div class="flex" style="justify-content:space-between">
+        <div><b>Selected Station Summary</b></div>
+        <div class="badge" id="countsBadge"></div>
+      </div>
+      <div class="muted small">NET = taken − returned (export keeps both columns like your sheet).</div>
+      <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-top:10px;">
+        <label style="margin:0;">Search Log</label>
+        <input id="logSearch" placeholder="Filter log by item / station / bar…" />
+      </div>
+
+
+      <div class="log">
+        <table>
+          <thead>
+            <tr><th>Time</th><th>Bar</th><th>Station</th><th>Item</th><th class="right">Action</th></tr>
+          </thead>
+          <tbody id="log"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="muted small">Selected station totals</div>
+        <div class="log" style="max-height:240px;">
+          <table>
+            <thead><tr><th>Item</th><th class="right">Taken</th><th class="right">Returned</th><th class="right">NET</th></tr></thead>
+            <tbody id="totals"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE -->
+<div class="modalBackdrop" id="compareBackdrop">
+  <div class="modal"><div class="flex" style="justify-content:space-between;margin-bottom:10px">
+    <b style="font-size:15px">↔️ Compare Two Nights</b>
+    <button id="closeCompareBtn" class="btnGray miniBtn">✖ Close</button></div>
+    <div class="row" style="margin-bottom:12px">
+      <div><label>Night A</label><select id="compareSelA" style="width:100%"></select></div>
+      <div><label>Night B</label><select id="compareSelB" style="width:100%"></select></div>
+    </div>
+    <div class="rightFlex" style="margin-bottom:14px"><button id="runCompareBtn" class="btnBlue">Compare →</button></div>
+    <div id="compareResult"></div>
+  </div>
+</div>
+<!-- HISTORY -->
+<div class="modalBackdrop" id="historyBackdrop">
+  <div class="modal"><div class="flex" style="justify-content:space-between;margin-bottom:10px">
+    <b style="font-size:15px">🕐 Night Archive</b>
+    <button id="closeHistoryBtn" class="btnGray miniBtn">✖ Close</button></div>
+    <div class="help" style="margin-bottom:10px">Click a night to see its breakdown.</div>
+    <div id="archiveCards" style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"></div>
+    <div id="archiveDetail" style="margin-top:14px"></div>
+  </div>
+</div>
+<!-- BULK APPLY -->
+<div class="modalBackdrop" id="bulkBackdrop">
+  <div class="modal" style="width:min(560px,100%)"><div class="flex" style="justify-content:space-between;margin-bottom:10px">
+    <b style="font-size:15px">🎯 Bulk Apply to Multiple Stations</b>
+    <button id="closeBulkBtn" class="btnGray miniBtn">✖ Close</button></div>
+    <div class="row" style="margin-bottom:10px">
+      <div><label>Item</label><select id="bulkItem" style="width:100%"></select></div>
+      <div><label>Qty</label><input id="bulkQty" type="number" min="1" value="1" style="width:100%"/></div>
+    </div>
+    <label>Select Stations</label>
+    <div id="bulkStationList" class="stGrid" style="max-height:220px;overflow:auto;margin-bottom:12px"></div>
+    <div class="rightFlex" style="gap:8px;flex-wrap:wrap">
+      <button id="bulkSelectAll"   class="btnGray miniBtn">Select All</button>
+      <button id="bulkDeselectAll" class="btnGray miniBtn">Deselect All</button>
+      <button id="bulkTakenBtn"    class="btnGreen">+ Apply Taken</button>
+      <button id="bulkRetBtn"      class="btnRed">− Apply Returned</button>
+    </div>
+  </div>
+</div>
+<!-- WAREHOUSE MODAL -->
+<div class="modalBackdrop" id="warehouseBackdrop">
+  <div class="modal" style="width:min(1100px,100%);max-height:92vh;overflow:auto;">
+
+    <!-- Header -->
+    <div class="flex" style="justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <b style="font-size:16px">🏭 Warehouse Inventory</b>
+        <div class="help" style="margin-top:2px;">Category → Brand/Type → Size. Track stock, set minimums, transfer to bars.</div>
+      </div>
+      <div class="flex" style="gap:8px;flex-wrap:wrap;">
+        
+        <button id="whImportBclBtn" class="btnGreen miniBtn">⬆️ Import BCL CSV</button>
+        <input id="whImportBclFile" type="file" accept=".csv,text/csv" style="display:none" />
+        <button id="whExportBtn"    class="btnBlue miniBtn">⬇️ Export CSV</button>
+        <button id="closeWhBtn"     class="btnGray miniBtn">✖ Close</button>
+      </div>
+    </div>
+
+    <hr/>
+
+    <!-- Barcode scanner bar -->
+    <div class="bc-bar">
+      <span style="font-size:18px;">📷</span>
+      <input id="bcInput" class="bc-input" placeholder="Scan barcode or type & press Enter…"
+        autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <button id="bcCamBtn" class="btnGray miniBtn" title="Use camera to scan">📸 Camera</button>
+      <span id="bcStatus" class="bc-status">Ready</span>
+    </div>
+
+    <!-- Scan result popup (hidden by default) -->
+    <div id="bcPopup" style="display:none;"></div>
+
+    <!-- Camera overlay (hidden by default) -->
+    <div class="bc-camOverlay" id="bcCamOverlay" style="display:none;">
+      <div style="color:#fff;font-size:14px;font-weight:700;">Point camera at barcode</div>
+      <video id="bc-video" autoplay playsinline muted></video>
+      <div class="bc-scanLine"></div>
+      <button class="bc-camClose" id="bcCamClose">✖ Cancel</button>
+    </div>
+
+    <!-- Default size unit selector -->
+    <div class="flex" style="gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
+      <span class="muted small">Default size unit:</span>
+      <button class="wh-sizePreset" data-unit="ml" id="whUnitMl">ml</button>
+      <button class="wh-sizePreset" data-unit="L"  id="whUnitL">L</button>
+      <span class="muted small" style="margin-left:8px;">Quick sizes:</span>
+      <div id="whSizePresets" class="flex" style="gap:6px;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- Category tabs -->
+    <div class="flex" style="gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="whCatTabs"></div>
+
+    <!-- Items grid -->
+    <div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));" id="whItems"></div>
+
+    <hr style="margin:16px 0;"/>
+
+    <!-- Add item form -->
+    <div class="box">
+      <b>Add / Edit Item</b>
+      <div class="wh-form" style="margin-top:10px;">
+        <div>
+          <label>Category (Group)</label>
+          <input id="whNewCat"   placeholder="e.g. Vodka" list="whCatList"/>
+          <datalist id="whCatList"></datalist>
+        </div>
+        <div>
+          <label>Brand / Type</label>
+          <input id="whNewBrand" placeholder="e.g. Grey Goose"/>
+        </div>
+        <div>
+          <label>Size</label>
+          <input id="whNewSize"  placeholder="750" style="width:80px;display:inline-block;"/>
+          <select id="whNewUnit" style="width:70px;display:inline-block;margin-left:6px;">
+            <option value="ml">ml</option>
+            <option value="L">L</option>
+          </select>
+        </div>
+        <div>
+          <label>Opening Stock</label>
+          <input id="whNewStock" type="number" min="0" value="0" placeholder="0"/>
+        </div>
+        <div>
+          <label>Min Stock Alert</label>
+          <input id="whNewMin"   type="number" min="0" value="0" placeholder="0"/>
+        </div>
+      </div>
+      <div class="rightFlex" style="margin-top:10px;gap:8px;">
+        <button id="whAddItemBtn" class="btnGreen">+ Add Item</button>
+      </div>
+    </div>
+
+    <hr style="margin:16px 0;"/>
+
+    <!-- Transfer log -->
+    <div>
+      <div class="flex" style="justify-content:space-between;align-items:center;">
+        <b>Transfer Log</b>
+        <span class="muted small">Warehouse → Bar movements</span>
+      </div>
+      <div class="wh-transferLog">
+        <table>
+          <thead><tr>
+            <th>Time</th><th>Item</th><th>Qty</th><th>To Bar</th><th>Note</th>
+          </tr></thead>
+          <tbody id="whTransferLog"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Setup modal -->
+<div class="modalBackdrop" id="setupBackdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Setup">
+    <div class="flex" style="justify-content:space-between">
+      <div>
+        <b>Setup</b>
+        <div class="help">Everything you set here is saved in your browser (localStorage). No names are prefilled.</div>
+      </div>
+      <div class="rightFlex">
+        <button id="closeSetupTop" class="btnGray">✖ Close</button>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+      <div class="box">
+        <b>Night / Event</b>
+        <div class="help" style="margin-top:6px;">
+          Use any label you want (example: “Sat Feb 21 – Latin Night”). Each night keeps its own bars, staff, and counts.
+        </div>
+
+        <label style="margin-top:10px;">Select existing night</label>
+        <div class="flex">
+          <select id="nightSelect" style="min-width:260px;"></select>
+          <button id="deleteNightBtn" class="btnRed miniBtn" title="Delete selected night (config + counts)">Delete Night</button>
+        </div>
+
+        <label style="margin-top:10px;">Create new night</label>
+        <div class="flex">
+          <input id="newNightName" placeholder="Night name / event label" style="min-width:260px;flex:1;" />
+          <button id="createNightBtn" class="btnGreen miniBtn">Create</button>
+        </div>
+        <div class="help" style="margin-top:8px;">
+          Tip: keep it short so it looks nice on exports.
+        </div>
+        <label style="margin-top:10px;">Copy setup from another night</label>
+        <div class="flex">
+          <select id="copyFromSelect" style="min-width:200px;flex:1;"></select>
+          <button id="copySetupBtn" class="btnTeal miniBtn">Copy Setup →</button>
+        </div>
+        <div class="help" style="margin-top:4px;">Copies groups, bars, stations &amp; items — NOT counts.</div>
+      </div>
+      <div class="box">
+        <b>Items (Booze)</b>
+        <div class="help" style="margin-top:6px;">
+          Add/remove items anytime. Items are saved per night in your browser (localStorage). Export uses <span class="kbd">Item</span> and <span class="kbd">Returned</span> columns for each item.
+        </div>
+
+        <label style="margin-top:10px;">Quick add item</label>
+        <div class="flex">
+          <input id="quickAddItem" placeholder="e.g., Vodka" style="min-width:260px;flex:1;" />
+          <button id="quickAddItemBtn" class="btnGreen miniBtn">Add</button>
+        </div>
+
+        <div class="help" style="margin-top:8px;">Current items (tap 🗑 to remove):</div>
+        <div id="itemsList" class="stGrid" style="margin-top:10px;"></div>
+
+        <hr />
+
+        <div class="help">Batch edit (one item per line):</div>
+        <textarea id="itemsTextarea" placeholder="Example:
+Vodka
+Gin
+Beer
+Red Bull"></textarea>
+        <div class="rightFlex" style="margin-top:10px;">
+          <button id="applyItemsBtn" class="btnBlue miniBtn">Apply Items</button>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+
+    
+    <div class="box" id="parLevelsBox">
+      <b>Par Levels</b>
+      <div class="help" style="margin-top:6px;">Expected NET per station — shown as badge on item cards and used in Variance Report. Set 0 to disable.</div>
+      <div id="parLevelsList" class="stGrid" style="margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));"></div>
+    </div>
+    <hr />
+    <div class="box" id="startNightBox">
+      <b>Start of Night</b>
+      <div class="help" style="margin-top:6px;">
+        1) Set bartender names quickly. 2) Apply a “bucket” of items to everyone (adds to <span class="kbd">Taken</span>).
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <div class="box" style="background:#0b1220;">
+          <b>Quick People Names</b>
+          <div class="help" style="margin-top:6px;">This edits <span class="kbd">Bartender name</span> only (safe — it won’t affect counts).</div>
+          <div id="quickNamesList" class="stGrid" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="box" style="background:#0b1220;">
+          <b>Bucket Distribution</b>
+          <div class="help" style="margin-top:6px;">
+            Type lines like <span class="kbd">35 Water</span> or <span class="kbd">Red Bull = 4</span>. Then apply to everyone.
+          </div>
+
+          <label style="margin-top:10px;">Bucket list</label>
+          <textarea id="bucketTextarea" placeholder="Example:
+35 Water
+Red Bull = 4
+2 Beer"></textarea>
+
+          <div class="rightFlex" style="margin-top:10px; flex-wrap:wrap; gap:8px;">
+            <button id="applyDefaultBucketNowBtn" class="btnGreen" style="padding:14px 16px;border-radius:16px;font-size:16px;font-weight:800;">
+              ✅ APPLY DEFAULT BUCKET NOW
+            </button>
+
+            <button id="applyBucketAllBtn" class="btnGreen miniBtn">Apply to ALL stations (Taken)</button>
+            <button id="applyBucketCurrentBtn" class="btnBlue miniBtn">Apply to CURRENT station</button>
+            <button id="saveDefaultBucketBtn" class="btnGray miniBtn">Save as Default</button>
+            <button id="loadDefaultBucketBtn" class="btnGray miniBtn">Load Default</button>
+          </div>
+
+          <div class="help" style="margin-top:8px;">
+            Note: this <b>adds</b> to existing counts. Export will include the updated totals.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+<div class="box" id="securityBox">
+      <b>Security & Backup</b>
+      <div class="help" style="margin-top:6px;">
+        Optional Admin PIN protects <span class="kbd">Setup</span>, <span class="kbd">Reset</span>, <span class="kbd">Delete Night</span>, item removal, and <span class="kbd">Lock/Unlock</span>.
+        Backup/Restore lets you move data to another device or recover if browser storage is cleared.
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <div class="box" style="background:#0b1220;">
+          <b>Admin PIN</b>
+          <div class="help" style="margin-top:6px;">Set a PIN once. Leave blank to disable protection.</div>
+          <label style="margin-top:10px;">New PIN</label>
+          <input id="pinNew" type="password" inputmode="numeric" autocomplete="off" placeholder="Enter new PIN" />
+          <label style="margin-top:10px;">Confirm PIN</label>
+          <input id="pinConfirm" type="password" inputmode="numeric" autocomplete="off" placeholder="Confirm new PIN" />
+          <div class="rightFlex" style="margin-top:10px;">
+            <button id="setPinBtn" class="btnGreen miniBtn">Set / Change PIN</button>
+            <button id="clearPinBtn" class="btnRed miniBtn">Clear PIN</button>
+          </div>
+          <div class="help" id="pinStatus" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="box" style="background:#0b1220;">
+          <b>Backup / Restore</b>
+          <div class="help" style="margin-top:6px;">Backup includes all nights, bars, staff, counts, and logs.</div>
+          <div class="rightFlex" style="margin-top:10px;">
+            <button id="backupBtn" class="btnBlue miniBtn">⬇️ Export Backup (.json)</button>
+            <button id="restoreBtn" class="btnBlue miniBtn">⬆️ Restore Backup</button>
+          </div>
+          <input id="restoreFile" type="file" accept="application/json" style="display:none" />
+          <div class="help" style="margin-top:8px;">
+            Tip: Export a backup before using <span class="kbd">Reset Night</span>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+
+    <div class="box">
+      <div class="flex" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <b>Groups → Bars → Bartenders</b>
+        <div class="flex" style="gap:8px;">
+          <button id="addGroupBtn"      class="btnTeal miniBtn">+ Add Group</button>
+          <button id="importCsvBarsBtn" class="btnGray miniBtn">⬆️ Import CSV</button>
+          <input  id="csvBarsFile" type="file" accept=".csv,text/csv" style="display:none"/>
+        </div>
+      </div>
+      <div class="help" style="margin-top:6px;">
+        Create groups (e.g. "Theater", "Harbour"), add named bars inside each, then add bartenders.
+        CSV: <span class="kbd">Group,Bar,Station,Bartender,Barback,Placement</span>
+      </div>
+
+      <div id="barsEditor" class="stGrid" style="margin-top:12px;"></div>
+
+      <div class="rightFlex" style="margin-top:12px;">
+        <button id="saveSetupBtn" class="btnGreen">💾 Save Setup</button>
+        <button id="closeSetupBtn" class="btnGray">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Inventory Clicker — Pro/Reliable build (v2)
+   - IndexedDB storage (more reliable than localStorage on iOS)
+   - Admin PIN protection (optional)
+   - Lock/Unlock night (view + export only when locked)
+   - Full Backup/Restore JSON
+   - Qty input (add/remove in bulk, no 35-clicking)
+   - Rename items safely (keeps counts + logs)
+   - Start-of-night bucket distribution to all bartenders
+   - Quick edit bartender names (safe)
+*/
+(async function(){
+"use strict";
+
+/* =========================
+   Utilities
+========================= */
+function el(id){ return document.getElementById(id); }
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[s])); }
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function fmtTime(iso){
+  const d=new Date(iso);
+  return d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+}
+function todayLabel(){
+  const d = new Date();
+  return d.toLocaleDateString([], {weekday:"short", month:"short", day:"2-digit", year:"numeric"});
+}
+function csvCell(v){
+  const s = String(v ?? "");
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+}
+function safeFilePart(s){
+  return String(s||"night").trim().replace(/[^\w\-]+/g,"_").replace(/_+/g,"_").replace(/^_+|_+$/g,"").slice(0,40) || "night";
+}
+function toast(msg){
+  const t = el("toast");
+  if(!t) return;
+  t.textContent = msg;
+  setTimeout(()=>{ if(t.textContent===msg) t.textContent=""; }, 1400);
+}
+function downloadBlob(filename, blob){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function downloadText(filename, text, mime){
+  downloadBlob(filename, new Blob([text], {type: (mime || "text/plain;charset=utf-8")}));
+}
+function nightKey(nightId){ return String(nightId || "").trim() || todayLabel(); }
+function clampInt(n, min, max){
+  n = parseInt(String(n||"").replace(/[^\d\-]/g,""), 10);
+  if(isNaN(n)) n = min;
+  if(n < min) n = min;
+  if(max != null && n > max) n = max;
+  return n;
+}
+function getQty(){
+  const q = el("qty");
+  if(!q) return 1;
+  const v = clampInt(q.value, 1, 9999);
+  q.value = String(v);
+  return v;
+}
+
+/* =========================
+   IndexedDB (KV store)
+========================= */
+const DB_NAME = "invClickerDB_v1";
+const DB_VER = 1;
+const KV = "kv";
+let USE_LS = false; // fallback when IndexedDB is blocked (common in Safari Private Mode)
+const LS_PREFIX = "invClicker_kv_v1|";
+function lsGetKV(key){
+  try{
+    const raw = localStorage.getItem(LS_PREFIX + key);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function lsSetKV(key, value){
+  try{
+    localStorage.setItem(LS_PREFIX + key, JSON.stringify(value));
+    return true;
+  }catch(e){ return false; }
+}
+function lsDelKV(key){
+  try{ localStorage.removeItem(LS_PREFIX + key); return true; }catch(e){ return false; }
+}
+
+let db = null;
+
+function openDB(){
+  return new Promise((resolve, reject)=>{
+    if(!("indexedDB" in window)) return reject(new Error("IndexedDB not supported"));
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = () => {
+      const d = req.result;
+      if(!d.objectStoreNames.contains(KV)){
+        d.createObjectStore(KV, { keyPath: "key" });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function idbTx(mode){
+  const tx = db.transaction(KV, mode);
+  return tx.objectStore(KV);
+}
+function idbGet(key){
+  if(USE_LS) return Promise.resolve(lsGetKV(key));
+  return new Promise((resolve)=>{
+    try{
+      const os = idbTx("readonly");
+      const r = os.get(key);
+      r.onsuccess = ()=> resolve(r.result ? r.result.value : null);
+      r.onerror = ()=> resolve(null);
+    }catch(e){ resolve(null); }
+  });
+}
+function idbSet(key, value){
+  if(USE_LS) return Promise.resolve(lsSetKV(key, value));
+  return new Promise((resolve, reject)=>{
+    try{
+      const os = idbTx("readwrite");
+      const r = os.put({key, value});
+      r.onsuccess = ()=> resolve(true);
+      r.onerror = ()=> reject(r.error);
+    }catch(e){ reject(e); }
+  });
+}
+function idbDel(key){
+  if(USE_LS) return Promise.resolve(lsDelKV(key));
+  return new Promise((resolve)=>{
+    try{
+      const os = idbTx("readwrite");
+      const r = os.delete(key);
+      r.onsuccess = ()=> resolve(true);
+      r.onerror = ()=> resolve(false);
+    }catch(e){ resolve(false); }
+  });
+}
+
+/* =========================
+   Data model
+========================= */
+const MASTER_KEY = "STORE";
+const STATE_KEY = (nid)=> `STATE|${nid}`;
+const LOG_KEY   = (nid)=> `LOG|${nid}`;
+
+/* Defaults */
+const DEFAULT_NIGHT_ID = todayLabel();
+const DEFAULT_CONFIG = {
+  nightLabel: DEFAULT_NIGHT_ID,
+  locked: false,
+  items: ["Vodka", "Gin", "Tequila", "Whiskey", "Beer", "Red Bull", "Water"],
+  sections: [
+    { group: "Group 1", bar: "B1", stations: [
+      { station: "Bartender 1", bartender_name: "", barback: "", placement: "P1", bars_label: "" }
+    ] }
+  ]
+};
+const DEFAULT_STORE = {
+  activeNightId: DEFAULT_NIGHT_ID,
+  global: { pinHash: "", defaultBucketText: "" },
+  nights: { [DEFAULT_NIGHT_ID]: deepClone(DEFAULT_CONFIG) },
+  warehouse: { items: [], transferLog: [], defaultUnit: "ml", defaultSize: 750 }
+};
+
+let store = deepClone(DEFAULT_STORE);
+let activeNightId = nightKey(store.activeNightId);
+let CONFIG = store.nights[activeNightId] || deepClone(DEFAULT_CONFIG);
+let state = {};
+let log = [];
+let bar = CONFIG.sections[0]?.bar || "B1";
+let station = CONFIG.sections[0]?.stations?.[0]?.station || "Bartender 1";
+
+
+/* =========================
+   Cloud API bridge
+========================= */
+const API_BASE = "https://inventory-mvp-production.up.railway.app";
+let AUTH_TOKEN = localStorage.getItem("inv_api_token") || "";
+let AUTH_USER = null;
+let CLOUD_MODE = true;
+let API_ITEM_MAP = {};
+let API_ITEMS = [];
+
+function apiHeaders(extra = {}){
+  return {
+    "Content-Type": "application/json",
+    ...(AUTH_TOKEN ? { Authorization: `Bearer ${AUTH_TOKEN}` } : {}),
+    ...extra
+  };
+}
+
+async function apiFetch(path, options = {}){
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: apiHeaders(options.headers || {})
+  });
+
+  let data = null;
+  try{ data = await res.json(); }catch(e){}
+
+  if(!res.ok){
+    const msg = data?.error || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+function saveApiToken(token){
+  AUTH_TOKEN = token || "";
+  if(AUTH_TOKEN) localStorage.setItem("inv_api_token", AUTH_TOKEN);
+  else localStorage.removeItem("inv_api_token");
+}
+
+function logoutApi(){
+  AUTH_USER = null;
+  saveApiToken("");
+}
+
+function showApiLogin(show = true){
+  const bd = el("apiLoginBackdrop");
+  if(!bd) return;
+  bd.style.display = show ? "flex" : "none";
+}
+
+function mapBarsStationsToSections(payload){
+  const bars = payload?.bars || [];
+  const stations = payload?.stations || [];
+
+  return bars.map((b, i) => ({
+    group: "Group 1",
+    bar: b.name,
+    barId: b.id,
+    stations: stations
+      .filter(s => s.bar_id === b.id)
+      .map((s, idx) => ({
+        station: s.name,
+        bartender_name: s.name,
+        barback: "",
+        placement: "",
+        bars_label: "",
+        stationId: s.id,
+        barId: b.id
+      }))
+  })).filter(sec => sec.stations.length);
+}
+
+function rebuildStateFromApiEvents(events){
+  const next = {};
+  function ensureBucket(barName, stationName, itemName){
+    next[barName] ||= {};
+    next[barName][stationName] ||= {};
+    next[barName][stationName][itemName] ||= { taken: 0, returned: 0 };
+    return next[barName][stationName][itemName];
+  }
+
+  for(const ev of (events || [])){
+    const barName = ev.bar_name || "Unknown Bar";
+    const stationName = ev.station_name || "Unknown Station";
+    const itemName = ev.item_name || ev.barcode || "Unknown Item";
+    const qty = Number(ev.qty || 1);
+    const bucket = ensureBucket(barName, stationName, itemName);
+
+    if(ev.type === "DELIVERED" || ev.type === "REQUEST"){
+      bucket.taken += qty;
+    }else if(ev.type === "RETURNED"){
+      bucket.returned += qty;
+    }
+  }
+  return next;
+}
+
+function rebuildLogFromApiEvents(events){
+  return (events || []).map(ev => ({
+    ts: ev.created_at,
+    bar: ev.bar_name || "Unknown Bar",
+    station: ev.station_name || "Unknown Station",
+    item: ev.item_name || ev.barcode || "Unknown Item",
+    action: ev.type === "RETURNED" ? "returned" : "taken",
+    qty: Number(ev.qty || 1),
+    status: ev.status || "",
+    by: ev.created_by_name || ""
+  }));
+}
+
+async function apiOpenNight(nightLabel){
+  return await apiFetch("/api/night/open", {
+    method: "POST",
+    body: JSON.stringify({ dateKey: nightLabel || todayLabel() })
+  });
+}
+
+async function apiLoadCatalogsIntoConfig(){
+  const [barsResp, itemsResp] = await Promise.all([
+    apiFetch("/api/bars"),
+    apiFetch("/api/items")
+  ]);
+
+  API_ITEMS = itemsResp || [];
+  API_ITEM_MAP = Object.fromEntries(API_ITEMS.map(x => [x.name, x.id]));
+
+  const mappedSections = mapBarsStationsToSections(barsResp);
+  if(mappedSections.length){
+    CONFIG.sections = mappedSections;
+  }
+  if(API_ITEMS.length){
+    CONFIG.items = normalizeItems(API_ITEMS.map(x => x.name).filter(Boolean));
+  }
+  store.nights[activeNightId] = CONFIG;
+}
+
+async function apiRefreshNightData(){
+  const evs = await apiFetch(`/api/events?nightId=${encodeURIComponent(activeNightId)}`);
+  state = rebuildStateFromApiEvents(evs);
+  log = rebuildLogFromApiEvents(evs);
+}
+
+async function apiBootstrapCurrentNight(){
+  const currentLabel = CONFIG?.nightLabel || todayLabel();
+  const night = await apiOpenNight(currentLabel);
+  activeNightId = night.id;
+  CONFIG.nightLabel = night.date_key || currentLabel;
+  store.activeNightId = activeNightId;
+  store.nights[activeNightId] = CONFIG;
+
+  await apiLoadCatalogsIntoConfig();
+  await apiRefreshNightData();
+  await saveStore();
+
+  _curGroup = null;
+  _ensureGroups();
+  bar = (CONFIG.sections.find(s=>s.group===_curGroup)||CONFIG.sections[0])?.bar || "B1";
+  station = (CONFIG.sections.find(s=>s.bar===bar)?.stations[0])?.station || "Bartender 1";
+}
+
+async function loginToApi(){
+  const username = (el("apiLoginUsername")?.value || "").trim();
+  const pin = (el("apiLoginPin")?.value || "").trim();
+  const msg = el("apiLoginMsg");
+  if(msg) msg.textContent = "";
+
+  if(!username || !pin){
+    if(msg) msg.textContent = "Enter username and PIN.";
+    return false;
+  }
+
+  try{
+    const res = await apiFetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, pin })
+    });
+    saveApiToken(res.token);
+    AUTH_USER = res.user || null;
+    await apiBootstrapCurrentNight();
+    showApiLogin(false);
+    renderAll();
+    renderSetup();
+    toast(`Logged in as ${AUTH_USER?.displayName || AUTH_USER?.username || username}`);
+    return true;
+  }catch(err){
+    if(msg) msg.textContent = `Login failed: ${err.message}`;
+    return false;
+  }
+}
+
+function bindApiLoginUI(){
+  el("apiLoginBtn")?.addEventListener("click", loginToApi);
+  el("apiSkipBtn")?.addEventListener("click", async () => {
+    CLOUD_MODE = false;
+    showApiLogin(false);
+    state = await ensureState();
+    log = await loadNightLog(activeNightId);
+    renderAll();
+    renderSetup();
+    toast("Running in local mode.");
+  });
+}
+
+async function submitInventoryEvent(itemName, direction, qty){
+  if(!CLOUD_MODE || !AUTH_TOKEN) return false;
+
+  const sec = (CONFIG.sections || []).find(s => s.bar === bar);
+  const st = (sec?.stations || []).find(x => x.station === station);
+  const itemId = API_ITEM_MAP[itemName] || null;
+
+  await apiFetch("/api/events", {
+    method: "POST",
+    body: JSON.stringify({
+      nightId: activeNightId,
+      type: direction === "minus" ? "RETURNED" : "DELIVERED",
+      barId: sec?.barId || null,
+      stationId: st?.stationId || null,
+      itemId,
+      barcode: null,
+      qty: Number(qty || 1),
+      note: ""
+    })
+  });
+
+  await apiRefreshNightData();
+  renderAll();
+  return true;
+}
+
+/* =========================
+   Migration (from old localStorage builds)
+========================= */
+function tryReadLocalStorage(key){
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+function tryParseJSON(raw){
+  try{ return JSON.parse(raw); }catch(e){ return null; }
+}
+async function migrateFromLocalStorageIfFound(){
+  const oldStoreRaw = tryReadLocalStorage("inv_app_v3");
+  if(!oldStoreRaw) return false;
+  const oldStore = tryParseJSON(oldStoreRaw);
+  if(!oldStore || !oldStore.nights) return false;
+
+  const migrated = { activeNightId: oldStore.activeNightId || Object.keys(oldStore.nights)[0] || DEFAULT_NIGHT_ID, global:{pinHash:"", defaultBucketText:""}, nights:{} };
+  for(const nid of Object.keys(oldStore.nights)){
+    const c = oldStore.nights[nid] || deepClone(DEFAULT_CONFIG);
+    migrated.nights[nid] = {
+      nightLabel: c.nightLabel || nid,
+      locked: !!c.locked,
+      items: Array.isArray(c.items) ? c.items : deepClone(DEFAULT_CONFIG.items),
+      sections: Array.isArray(c.sections) ? c.sections : deepClone(DEFAULT_CONFIG.sections)
+    };
+  }
+
+  for(const nid of Object.keys(migrated.nights)){
+    const keySafe = nid.replace(/\s+/g,'_');
+    const sRaw = tryReadLocalStorage("inv_state_v3_" + keySafe);
+    const lRaw = tryReadLocalStorage("inv_log_v3_" + keySafe);
+    const s = tryParseJSON(sRaw) || null;
+    const l = tryParseJSON(lRaw) || null;
+    if(s) await idbSet(STATE_KEY(nid), s);
+    if(l) await idbSet(LOG_KEY(nid), l);
+  }
+
+  await idbSet(MASTER_KEY, migrated);
+  return true;
+}
+
+/* =========================
+   PIN (optional)
+========================= */
+async function hashPin(pin){
+  const data = new TextEncoder().encode("invclicker|" + String(pin));
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function hasPin(){
+  return !!(store?.global?.pinHash);
+}
+async function requirePin(reason){
+  if(!hasPin()) return true;
+  const input = prompt(`Admin PIN required (${reason}).`);
+  if(input === null) return false;
+  const h = await hashPin(input);
+  if(h === store.global.pinHash) return true;
+  alert("Wrong PIN.");
+  return false;
+}
+function updatePinStatus(){
+  const p = el("pinStatus");
+  if(!p) return;
+  p.textContent = hasPin() ? "PIN is enabled." : "PIN is NOT set (open access).";
+}
+async function setOrChangePin(){
+  const a = (el("pinNew")?.value || "").trim();
+  const b = (el("pinConfirm")?.value || "").trim();
+  if(!a || !b) return alert("Enter PIN + confirm it.");
+  if(a !== b) return alert("PIN confirmation does not match.");
+  if(hasPin()){
+    const ok = await requirePin("change PIN");
+    if(!ok) return;
+  }
+  store.global.pinHash = await hashPin(a);
+  await saveStore();
+  el("pinNew").value = "";
+  el("pinConfirm").value = "";
+  updatePinStatus();
+  toast("PIN updated.");
+}
+async function clearPin(){
+  if(!hasPin()) return alert("No PIN is set.");
+  const ok = await requirePin("clear PIN");
+  if(!ok) return;
+  store.global.pinHash = "";
+  await saveStore();
+  updatePinStatus();
+  toast("PIN cleared.");
+}
+
+/* =========================
+   Persistence (IDB)
+========================= */
+async function loadStore(){
+  const s = await idbGet(MASTER_KEY);
+  if(s && s.nights) return s;
+  const migrated = await migrateFromLocalStorageIfFound();
+  if(migrated){
+    const s2 = await idbGet(MASTER_KEY);
+    if(s2 && s2.nights) return s2;
+  }
+  await idbSet(MASTER_KEY, deepClone(DEFAULT_STORE));
+  return deepClone(DEFAULT_STORE);
+}
+async function saveStore(){
+  await idbSet(MASTER_KEY, store);
+}
+async function loadNightState(nid){
+  const s = await idbGet(STATE_KEY(nid));
+  return s || {};
+}
+async function saveNightState(nid, obj){
+  await idbSet(STATE_KEY(nid), obj);
+}
+async function deleteNightState(nid){
+  await idbDel(STATE_KEY(nid));
+}
+async function loadNightLog(nid){
+  const l = await idbGet(LOG_KEY(nid));
+  return Array.isArray(l) ? l : [];
+}
+async function saveNightLog(nid, arr){
+  await idbSet(LOG_KEY(nid), arr);
+}
+async function deleteNightLog(nid){
+  await idbDel(LOG_KEY(nid));
+}
+
+/* =========================
+   State merge / pruning
+========================= */
+function normalizeItems(arr){
+  const seen = new Set();
+  const out = [];
+  for (const raw of arr) {
+    const s = String(raw || "").trim();
+    if(!s) continue;
+    const key = s.toLowerCase();
+    if(seen.has(key)) continue;
+    seen.add(key);
+    out.push(s);
+  }
+  return out;
+}
+async function pruneStateToItems(items){
+  const keep = new Set(items.map(i => i.toLowerCase()));
+  try{
+    for (const b of Object.keys(state || {})) {
+      for (const st of Object.keys(state[b] || {})) {
+        for (const it of Object.keys(state[b][st] || {})) {
+          if(!keep.has(String(it).toLowerCase())) delete state[b][st][it];
+        }
+      }
+    }
+    await saveNightState(activeNightId, state);
+  }catch(e){}
+}
+async function ensureState(){
+  const old = await loadNightState(activeNightId);
+  const next = {};
+  for (const sec of CONFIG.sections) {
+    const b = sec.bar;
+    next[b] ||= {};
+    for (const st of sec.stations) {
+      const sid = st.station;
+      next[b][sid] ||= {};
+      for (const item of CONFIG.items) {
+        const prev = old?.[b]?.[sid]?.[item];
+        next[b][sid][item] = { taken: (prev?.taken ?? 0), returned: (prev?.returned ?? 0) };
+      }
+    }
+  }
+  await saveNightState(activeNightId, next);
+  return next;
+}
+
+/* =========================
+   Selection helpers
+========================= */
+function getStationMeta(barName, stationId){
+  const sec = CONFIG.sections.find(s=>s.bar===barName);
+  const stations = sec ? sec.stations : [];
+  return stations.find(s => s.station === stationId);
+}
+function barsLabelFor(stMeta, barName){
+  if(stMeta?.bars_label && stMeta.bars_label.trim()) return stMeta.bars_label.trim();
+  const stName = stMeta?.station || "";
+  return `${barName} / ${stName}`.trim();
+}
+
+/* =========================
+   Lock
+========================= */
+function isLocked(){ return !!CONFIG.locked; }
+function updateLockUI(){
+  const btn = el("lockBtn");
+  if(btn) btn.textContent = isLocked() ? "🔒 Locked" : "🔓 Unlocked";
+
+  const editIds = ["setupBtn","startNightBtn","undoBtn","resetBtn"];
+  for(const id of editIds){
+    const b = el(id);
+    if(!b) continue;
+    b.disabled = isLocked();
+    b.style.opacity = isLocked() ? "0.55" : "1";
+    b.style.cursor = isLocked() ? "not-allowed" : "pointer";
+  }
+}
+async function toggleLock(){
+  const ok = await requirePin("toggle Lock");
+  if(!ok) return;
+  CONFIG.locked = !CONFIG.locked;
+  store.nights[activeNightId] = CONFIG;
+  await saveStore();
+  updateLockUI();
+  toast(CONFIG.locked ? "Night locked." : "Night unlocked.");
+}
+
+/* =========================
+   Rendering
+========================= */
+function renderNightPill(){
+  el("nightPill").textContent = `Night: ${CONFIG.nightLabel || activeNightId}`;
+}
+function renderSections(){
+  _ensureGroups();
+  const wrap = el("sectionTabs");
+  wrap.innerHTML = "";
+  for (const sec of CONFIG.sections.filter(s=>(s.group||"Group 1")===_curGroup)) {
+    const b = sec.bar;
+    const d = document.createElement("div");
+    d.className = "tab" + (b===bar ? " active" : "");
+    d.textContent = b;
+    d.onclick = () => {
+      bar = b;
+      station = (sec.stations[0]?.station) || station;
+      renderAll();
+    };
+    wrap.appendChild(d);
+  }
+}
+function renderStations(){
+  const sec = CONFIG.sections.find(s=>s.bar===bar);
+  const stations = sec ? sec.stations : [];
+  const wrap = el("stationTabs");
+  wrap.innerHTML = "";
+  for (const st of stations) {
+    const label = st.bartender_name ? `${st.station} — ${st.bartender_name}` : st.station;
+    const d = document.createElement("div");
+    d.className = "subtab" + (st.station===station ? " active" : "");
+    d.textContent = label;
+    d.onclick = () => { station = st.station; renderAll(); };
+    wrap.appendChild(d);
+  }
+  if(!stations.length){
+    const empty = document.createElement("div");
+    empty.className = "muted small";
+    empty.textContent = "No stations in this bar. Open Setup to add stations.";
+    wrap.appendChild(empty);
+  }
+}
+/* =========================
+   Navigator (accordion)
+========================= */
+const NAV_MODE_KEY = "invClicker_navMode_v1";
+const NAV_EXP_KEY  = "invClicker_navExpanded_v1";
+let navExpanded = new Set();
+function navLoadPrefs(){
+  try{
+    const mode = localStorage.getItem(NAV_MODE_KEY);
+    if(mode && el("navMode")) el("navMode").value = mode;
+    const expRaw = localStorage.getItem(NAV_EXP_KEY);
+    if(expRaw){
+      const arr = JSON.parse(expRaw);
+      if(Array.isArray(arr)) navExpanded = new Set(arr);
+    }
+  }catch(e){}
+}
+function navSavePrefs(){
+  try{
+    if(el("navMode")) localStorage.setItem(NAV_MODE_KEY, el("navMode").value);
+    localStorage.setItem(NAV_EXP_KEY, JSON.stringify([...navExpanded].slice(0,200)));
+  }catch(e){}
+}
+function navKey(mode, groupName){ return `${mode}||${groupName}`; }
+
+function navStationLabel(sec, st){
+  const bt = (st.bartender_name||"").trim();
+  const bb = (st.barback||"").trim();
+  const pl = (st.placement||"").trim();
+  const g  = (sec.group||"Group 1").trim();
+  const parts = [];
+  if(g) parts.push("Group: "+g);
+  if(bb) parts.push("Barback: "+bb);
+  if(pl) parts.push("Placement: "+pl);
+  return parts.join(" • ");
+}
+
+function navCollect(mode, search){
+  const q = (search||"").trim().toLowerCase();
+  const groups = new Map(); // groupName -> array of {sec, st, title, sub, pills[]}
+  const add = (groupName, sec, st, title, sub, pills=[])=>{
+    const hay = `${groupName} ${sec.group||""} ${sec.bar||""} ${st.station||""} ${st.bartender_name||""} ${st.barback||""} ${st.placement||""}`.toLowerCase();
+    if(q && !hay.includes(q)) return;
+    if(!groups.has(groupName)) groups.set(groupName, []);
+    groups.get(groupName).push({sec, st, title, sub, pills});
+  };
+
+  for(const sec of (CONFIG.sections||[])){
+    for(const st of (sec.stations||[])){
+      const barName = sec.bar;
+      const stLabel = st.station;
+      const bt = (st.bartender_name||stLabel||"").trim() || stLabel || "Station";
+      const bb = (st.barback||"").trim() || "—";
+      const pl = (st.placement||"").trim() || "—";
+      const grp = (sec.group||"Group 1").trim() || "Group 1";
+
+      if(mode==="bar"){
+        add(barName, sec, st, bt, navStationLabel(sec, st), [
+          `Bar: ${barName}`, `Station: ${stLabel}`
+        ]);
+      }else if(mode==="bartender"){
+        add(bt, sec, st, `${barName} / ${stLabel}`, navStationLabel(sec, st), [
+          `Bartender: ${bt}`
+        ]);
+      }else if(mode==="barback"){
+        add(bb, sec, st, `${barName} / ${bt}`, `Station: ${stLabel} • Group: ${grp} • Placement: ${pl}`, [
+          `Barback: ${bb}`
+        ]);
+      }else if(mode==="placement"){
+        add(pl, sec, st, `${barName} / ${bt}`, `Station: ${stLabel} • Group: ${grp} • Barback: ${bb}`, [
+          `Placement: ${pl}`
+        ]);
+      }else{ // group
+        add(grp, sec, st, `${barName} / ${bt}`, `Station: ${stLabel} • Barback: ${bb} • Placement: ${pl}`, [
+          `Group: ${grp}`
+        ]);
+      }
+    }
+  }
+
+  // sort groups alphabetically, items alphabetically by title
+  const out = [...groups.entries()].map(([name, arr])=>{
+    arr.sort((a,b)=> a.title.localeCompare(b.title));
+    return [name, arr];
+  });
+  out.sort((a,b)=> a[0].localeCompare(b[0]));
+  return out;
+}
+
+function renderNavigator(){
+  const listEl = el("navList");
+  const modeEl = el("navMode");
+  const searchEl = el("navSearch");
+  if(!listEl || !modeEl || !searchEl) return;
+
+  const mode = modeEl.value || "bar";
+  const groups = navCollect(mode, searchEl.value);
+
+  listEl.innerHTML = "";
+  if(!groups.length){
+    listEl.innerHTML = `<div class="muted small" style="padding:10px 2px;">No matches.</div>`;
+    return;
+  }
+
+  for(const [gName, items] of groups){
+    const gWrap = document.createElement("div");
+    gWrap.className = "navGroup";
+    const k = navKey(mode, gName);
+    const open = navExpanded.has(k);
+
+    const head = document.createElement("div");
+    head.className = "navHead";
+    head.innerHTML = `
+      <div style="min-width:0;">
+        <div class="navTitle">${escapeHtml(gName)}</div>
+        <div class="navSub">${items.length} station${items.length===1?"":"s"}</div>
+      </div>
+      <div class="navChevron">${open ? "▾" : "▸"}</div>
+    `;
+    const body = document.createElement("div");
+    body.className = "navBody";
+    body.style.display = open ? "block" : "none";
+
+    head.onclick = ()=>{
+      const isOpen = body.style.display === "block";
+      body.style.display = isOpen ? "none" : "block";
+      head.querySelector(".navChevron").textContent = isOpen ? "▸" : "▾";
+      if(isOpen) navExpanded.delete(k); else navExpanded.add(k);
+      navSavePrefs();
+    };
+
+    for(const it of items){
+      const row = document.createElement("div");
+      row.className = "navRow" + ((it.sec.bar===bar && it.st.station===station) ? " active" : "");
+      row.innerHTML = `
+        <div class="left">
+          <div class="top">${escapeHtml(it.title)}</div>
+          <div class="bot">${escapeHtml(it.sub)}</div>
+        </div>
+        <div class="pill">Open</div>
+      `;
+      row.onclick = ()=>{
+        // set selection
+        bar = it.sec.bar;
+        station = it.st.station;
+        if(typeof _curGroup !== "undefined"){
+          _curGroup = (it.sec.group||"Group 1");
+        }
+        renderAll();
+      };
+      body.appendChild(row);
+    }
+
+    gWrap.appendChild(head);
+    gWrap.appendChild(body);
+    listEl.appendChild(gWrap);
+  }
+}
+
+function wireNavigator(){
+  const modeEl = el("navMode");
+  const searchEl = el("navSearch");
+  if(modeEl){
+    modeEl.onchange = ()=>{ navSavePrefs(); renderNavigator(); };
+  }
+  if(searchEl){
+    searchEl.oninput = ()=> renderNavigator();
+  }
+  navLoadPrefs();
+}
+
+function renderMeta(){
+  const m = getStationMeta(bar, station);
+  const wrap = el("stationMeta");
+  wrap.innerHTML = "";
+  if(!m) return;
+  const pills = [];
+  pills.push({k:"Bars", v: barsLabelFor(m, bar)});
+  if(m.bartender_name) pills.push({k:"Bartender", v:m.bartender_name});
+  if(m.barback) pills.push({k:"Barback", v:m.barback});
+  if(m.placement) pills.push({k:"Placement", v:m.placement});
+  for (const p of pills) {
+    const s = document.createElement("div");
+    s.className = "metaPill";
+    s.textContent = `${p.k}: ${p.v}`;
+    wrap.appendChild(s);
+  }
+}
+
+function renderItems(){
+  el("where").textContent = `${bar} / ${station}`;
+  const q = (el("search").value||"").trim().toLowerCase();
+  const wrap = el("items");
+  wrap.innerHTML = "";
+  const list = q ? CONFIG.items.filter(i=>i.toLowerCase().includes(q)) : CONFIG.items;
+
+  for (const item of list) {
+    const entry = state?.[bar]?.[station]?.[item] || {taken:0, returned:0};
+    const net = (entry.taken||0) - (entry.returned||0);
+    const card = document.createElement("div");
+    card.className = "itemCard";
+    card.innerHTML = `
+      <div class="itemTop">
+        <div>
+          <div class="itemName">${escapeHtml(item)}</div>
+          <div class="muted">Use Qty box to add/remove in bulk</div>
+        </div>
+        <div class="countBox">
+          <div class="net">${net}</div>
+          <div class="sub">T:${entry.taken||0} • R:${entry.returned||0}</div>
+        </div>
+      </div>
+      <div class="pm">
+        <button class="minus" title="Returned (adds Qty to Returned)" ${isLocked() ? "disabled" : ""}>−</button>
+        <button class="plus" title="Taken (adds Qty to Taken)" ${isLocked() ? "disabled" : ""}>+</button>
+      </div>
+    `;
+    const buttons = card.querySelectorAll("button");
+    buttons[0].onclick = () => applyAction(item, "returned", getQty());
+    buttons[1].onclick = () => applyAction(item, "taken", getQty());
+    const _par = getPar(item);
+    if(_par > 0){
+      const _net=(entry.taken||0)-(entry.returned||0);
+      if(_net>_par) card.classList.add("over-par");
+      const _b=document.createElement("span");
+      _b.className="parBadge"; _b.title="Par=expected NET"; _b.textContent="Par:"+_par;
+      const _ne=card.querySelector(".itemName"); if(_ne) _ne.appendChild(_b);
+    }
+    wrap.appendChild(card);
+  }
+}
+
+function renderLog(){
+  const tbody = el("log");
+  tbody.innerHTML = "";
+  const q = (el("logSearch")?.value || "").trim().toLowerCase();
+  const source = log.slice(-200).reverse(); // show most recent first
+  const filtered = q ? source.filter(e => {
+    const hay = `${e.bar} ${e.station} ${e.item} ${e.action}`.toLowerCase();
+    return hay.includes(q);
+  }) : source;
+  for (const e of filtered) {
+    const qty = clampInt(e.qty ?? 1, 1, 9999);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${fmtTime(e.ts)}</td>
+      <td>${escapeHtml(e.bar)}</td>
+      <td>${escapeHtml(e.station)}</td>
+      <td>${escapeHtml(e.item)}</td>
+      <td class="right"><b style="color:${e.action==="taken" ? "#26d07c" : "#ff2d55"}">${e.action==="taken" ? "+ taken" : "− returned"}${qty>1 ? " x"+qty : ""}</b></td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+function renderTotals(){
+  const tbody = el("totals");
+  tbody.innerHTML = "";
+  const rows = CONFIG.items.map(item => {
+    const e = state?.[bar]?.[station]?.[item] || {taken:0, returned:0};
+    const t = e.taken||0, r = e.returned||0;
+    return [item, t, r, t-r];
+  }).sort((a,b)=>Math.abs(b[3])-Math.abs(a[3]));
+  let totalTaken = 0, totalReturned = 0;
+  for (const [item, t, r, n] of rows) {
+    totalTaken += t; totalReturned += r;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${escapeHtml(item)}</td><td class="right"><b>${t}</b></td><td class="right"><b>${r}</b></td><td class="right"><b>${n}</b></td>`;
+    tbody.appendChild(tr);
+  }
+  el("countsBadge").textContent = `Taken: ${totalTaken} • Returned: ${totalReturned} • Net: ${totalTaken-totalReturned}`;
+}
+
+function renderQuickNames(){
+  const root = el("quickNamesList");
+  if(!root) return;
+  root.innerHTML = "";
+  for(const sec of CONFIG.sections){
+    for(const st of sec.stations){
+      const card = document.createElement("div");
+      card.className = "stCard";
+      card.innerHTML = `
+        <h3>${escapeHtml(sec.bar)} / ${escapeHtml(st.station)}</h3>
+        <div class="fields">
+          <div style="grid-column:1/-1">
+            <label>Bartender name</label>
+            <input data-bar="${escapeHtml(sec.bar)}" data-st="${escapeHtml(st.station)}" value="${escapeHtml(st.bartender_name||"")}" placeholder="Type name…" />
+          </div>
+        </div>
+      `;
+      root.appendChild(card);
+    }
+  }
+  root.querySelectorAll("input[data-bar]").forEach(inp=>{
+    inp.oninput = () => {
+      const b = inp.getAttribute("data-bar");
+      const s = inp.getAttribute("data-st");
+      const sec = CONFIG.sections.find(x=>x.bar===b);
+      const st = sec?.stations?.find(x=>x.station===s);
+      if(st) st.bartender_name = inp.value;
+    };
+  });
+}
+
+function renderAll(){
+  renderNightPill();
+  renderGroups();
+  renderSections();
+  renderStations();
+  renderMeta();
+  renderItems();
+  renderLog();
+  renderTotals();
+  renderNavigator();
+  updateLockUI();
+}
+
+/* =========================
+   Actions (counting)
+========================= */
+async function applyAction(item, action, qty){
+  if(isLocked()) return;
+  qty = clampInt(qty, 1, 9999);
+
+  if(CLOUD_MODE && AUTH_TOKEN){
+    const usedApi = await submitInventoryEvent(item, action === "returned" ? "minus" : "plus", qty);
+    if(usedApi){
+      toast(`${bar} / ${station} • ${item} • ${action === "taken" ? "+ taken" : "− returned"}${qty>1 ? " x"+qty : ""}`);
+      return;
+    }
+  }
+
+  if(!state?.[bar]?.[station]?.[item]){
+    state = await ensureState();
+  }
+  const entry = state[bar][station][item];
+  if(action === "taken") entry.taken += qty;
+  if(action === "returned") entry.returned += qty;
+  log.push({ ts: new Date().toISOString(), bar, station, item, action, qty });
+
+  await saveNightState(activeNightId, state);
+  await saveNightLog(activeNightId, log);
+
+  renderAll();
+  toast(`${bar} / ${station} • ${item} • ${action === "taken" ? "+ taken" : "− returned"}${qty>1 ? " x"+qty : ""}`);
+}
+
+async function undo(){
+  if(isLocked()) return;
+  if(!log.length) return alert("Nothing to undo.");
+  const last = log.pop();
+  const qty = clampInt(last.qty ?? 1, 1, 9999);
+  const entry = state?.[last.bar]?.[last.station]?.[last.item];
+  if(entry){
+    if(last.action === "taken") entry.taken = Math.max(0, (entry.taken||0) - qty);
+    if(last.action === "returned") entry.returned = Math.max(0, (entry.returned||0) - qty);
+    await saveNightState(activeNightId, state);
+  }
+  await saveNightLog(activeNightId, log);
+  renderAll();
+}
+
+async function resetNight(){
+  if(isLocked()) return;
+  const okPin = await requirePin("reset night");
+  if(!okPin) return;
+  if(!confirm("Reset ALL bars/stations counts for this night?")) return;
+  await deleteNightState(activeNightId);
+  await deleteNightLog(activeNightId);
+  state = await ensureState();
+  log = [];
+  renderAll();
+}
+
+/* =========================
+   Export
+========================= */
+function exportSheetStyle(){
+  const header = ["Bars","Bartenders","Barbacks","Placement"];
+  for (const item of CONFIG.items) { header.push(item); header.push("Returned"); }
+  const lines = [header.map(csvCell).join(",")];
+
+  for (const sec of CONFIG.sections) {
+    for (const st of sec.stations) {
+      const row = [
+        csvCell(barsLabelFor(st, sec.bar)),
+        csvCell(st.bartender_name || ""),
+        csvCell(st.barback || ""),
+        csvCell(st.placement || "")
+      ];
+      for (const item of CONFIG.items) {
+        const e = state?.[sec.bar]?.[st.station]?.[item] || {taken:0, returned:0};
+        row.push(csvCell(e.taken||0));
+        row.push(csvCell(e.returned||0));
+      }
+      lines.push(row.join(","));
+    }
+  }
+  const filePart = safeFilePart(CONFIG.nightLabel || activeNightId);
+  downloadText(`inventory_sheet_style_${filePart}.csv`, lines.join("\n"), "text/csv;charset=utf-8");
+}
+function exportLog(){
+  if(!log.length) return alert("No log data to export.");
+  const headers = ["timestamp","bar","station","item","action","qty"];
+  const lines = [headers.join(",")].concat(
+    log.map(e => [
+      csvCell(e.ts),
+      csvCell(e.bar),
+      csvCell(e.station),
+      csvCell(e.item),
+      csvCell(e.action),
+      csvCell(clampInt(e.qty ?? 1, 1, 9999))
+    ].join(","))
+  );
+  const filePart = safeFilePart(CONFIG.nightLabel || activeNightId);
+  downloadText(`inventory_log_${filePart}.csv`, lines.join("\n"), "text/csv;charset=utf-8");
+}
+
+
+function exportReportHtml(){
+  // Printable/Shareable report (HTML). On iPad: open the exported .html -> Share -> Print -> Save as PDF.
+  const nightTitle = CONFIG.nightLabel || activeNightId;
+  const filePart = safeFilePart(nightTitle);
+
+  const css = `
+    :root{--bg:#0b1220;--card:#111a2e;--line:#203056;--muted:#a9b6d6;--text:#e8eefc;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px;}
+    h1{margin:0 0 6px 0;font-size:20px;}
+    .muted{color:var(--muted);font-size:12px;line-height:1.35}
+    .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px;}
+    .btn{border-radius:12px;border:1px solid #2a3d6b;background:#1a3cff;color:#fff;padding:10px 12px;font-weight:700;cursor:pointer}
+    .btn2{border-radius:12px;border:1px solid #2a3d6b;background:#2a3350;color:#fff;padding:10px 12px;font-weight:700;cursor:pointer}
+    .section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;}
+    .headerRow{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:#0b1220;color:var(--muted);font-size:12px;margin:4px 6px 0 0;}
+    table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;}
+    th,td{border-bottom:1px solid #22325b;padding:8px 6px;text-align:left;vertical-align:top;}
+    th{color:var(--muted);font-weight:700;}
+    td.r, th.r{text-align:right;}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+    .kpi .pill b{color:var(--text)}
+    @media print{
+      body{background:#fff;color:#000}
+      .section{background:#fff;border:1px solid #ddd}
+      .pill{background:#fff;border:1px solid #ddd;color:#333}
+      th{color:#333}
+      .btn,.btn2{display:none}
+      .muted{color:#333}
+    }
+  `;
+
+  let html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inventory Report</title>
+<style>${css}</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>🍾 Inventory Report</h1>
+        <div class="muted">Night: <b>${escapeHtml(nightTitle)}</b></div>
+        <div class="muted">Tip: use <b>Print</b> to save a PDF.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="btn2" onclick="window.close()">Close</button>
+      </div>
+    </div>
+`;
+
+  for (const sec of CONFIG.sections) {
+    for (const st of sec.stations) {
+      const metaPills = [];
+      const barsLabel = (st.bars_label && st.bars_label.trim()) ? st.bars_label.trim() : `${sec.bar} / ${st.station}`.trim();
+      metaPills.push(`Bars: <b>${escapeHtml(barsLabel)}</b>`);
+      if(st.bartender_name) metaPills.push(`Bartender: <b>${escapeHtml(st.bartender_name)}</b>`);
+      if(st.barback) metaPills.push(`Barback: <b>${escapeHtml(st.barback)}</b>`);
+      if(st.placement) metaPills.push(`Placement: <b>${escapeHtml(st.placement)}</b>`);
+
+      const rows = [];
+      let totalTaken = 0, totalReturned = 0;
+      for (const item of CONFIG.items) {
+        const e = state?.[sec.bar]?.[st.station]?.[item] || {taken:0, returned:0};
+        const t = e.taken||0, r = e.returned||0, n = t-r;
+        totalTaken += t; totalReturned += r;
+        // show only non-zero lines first, but still include zeros at the end for completeness
+        rows.push({item, t, r, n});
+      }
+      rows.sort((a,b)=> (Math.abs(b.n)-Math.abs(a.n)) || (b.t-a.t) || a.item.localeCompare(b.item));
+
+      html += `
+    <div class="section">
+      <div class="headerRow">
+        <div>
+          <div style="font-weight:900;font-size:15px;">${escapeHtml(sec.bar)} — ${escapeHtml(st.station)}</div>
+          <div class="kpi">
+            ${metaPills.map(p=>`<span class="pill">${p}</span>`).join("")}
+          </div>
+        </div>
+        <div class="kpi">
+          <span class="pill">Taken: <b>${totalTaken}</b></span>
+          <span class="pill">Returned: <b>${totalReturned}</b></span>
+          <span class="pill">Net: <b>${totalTaken-totalReturned}</b></span>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Item</th><th class="r">Taken</th><th class="r">Returned</th><th class="r">Net</th></tr>
+        </thead>
+        <tbody>
+          ${rows.map(r=>`<tr><td>${escapeHtml(r.item)}</td><td class="r"><b>${r.t}</b></td><td class="r"><b>${r.r}</b></td><td class="r"><b>${r.n}</b></td></tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+`;
+    }
+  }
+
+  html += `
+  </div>
+
+<div id="apiLoginBackdrop" style="position:fixed;inset:0;background:rgba(10,15,25,.72);display:none;align-items:center;justify-content:center;z-index:99999;">
+  <div style="width:min(420px,92vw);background:#111827;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.35);">
+    <div style="font-size:20px;font-weight:800;margin-bottom:8px;">Inventory Login</div>
+    <div style="opacity:.8;margin-bottom:14px;">Login to sync this device with cloud inventory.</div>
+
+    <label style="display:block;margin-bottom:8px;">Username</label>
+    <input id="apiLoginUsername" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:12px;" />
+
+    <label style="display:block;margin-bottom:8px;">PIN</label>
+    <input id="apiLoginPin" type="password" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:14px;" />
+
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <button id="apiLoginBtn" style="padding:12px 16px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer;">Login</button>
+      <button id="apiSkipBtn" style="padding:12px 16px;border:1px solid #475569;border-radius:12px;background:transparent;color:#fff;cursor:pointer;">Local Only</button>
+      <div id="apiLoginMsg" style="font-size:13px;color:#fca5a5;"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>`;
+
+  downloadText(`inventory_report_${filePart}.html`, html, "text/html;charset=utf-8");
+}
+
+
+/* =========================
+   Setup modal
+========================= */
+function openSetup(){
+  el("setupBackdrop").style.display = "flex";
+  el("setupBackdrop").setAttribute("aria-hidden","false");
+  renderSetup();
+}
+function closeSetup(){
+  el("setupBackdrop").style.display = "none";
+  el("setupBackdrop").setAttribute("aria-hidden","true");
+}
+
+/* Night switch */
+function renderNightSelect(){
+  const sel = el("nightSelect");
+  sel.innerHTML = "";
+  const ids = Object.keys(store.nights);
+  for(const id of ids){
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = store.nights[id]?.nightLabel || id;
+    if(id === activeNightId) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  sel.onchange = () => { switchNight(sel.value); };
+}
+async function switchNight(id){
+  const nid = nightKey(id);
+  if(!store.nights[nid]){
+    store.nights[nid] = deepClone(DEFAULT_CONFIG);
+    store.nights[nid].nightLabel = nid;
+  }
+  activeNightId = nid;
+  store.activeNightId = nid;
+  await saveStore();
+
+  CONFIG = store.nights[activeNightId];
+  if(typeof CONFIG.locked !== "boolean") CONFIG.locked = false;
+  CONFIG.items = normalizeItems(CONFIG.items || []);
+  if(!store.global) store.global = {pinHash:"", defaultBucketText:""};
+  if(typeof store.global.defaultBucketText !== "string") store.global.defaultBucketText = "";
+  // Migrate: ensure group + pars fields
+  if(!CONFIG.pars) CONFIG.pars = {};
+  if(Array.isArray(CONFIG.sections)){
+    const hasAnyGroup = CONFIG.sections.some(s => s.group && s.group.trim());
+    if(!hasAnyGroup) CONFIG.sections.forEach(s => { if(!s.group) s.group = "Group 1"; });
+  }
+
+  state = await ensureState();
+  log = await loadNightLog(activeNightId);
+
+  _curGroup = null;
+  _ensureGroups();
+  bar = (CONFIG.sections.find(s=>s.group===_curGroup)||CONFIG.sections[0])?.bar || bar;
+  station = (CONFIG.sections.find(s=>s.bar===bar)?.stations[0])?.station || station;
+
+  renderAll();
+  renderSetup();
+}
+async function createNight(){
+  const okPin = await requirePin("create night");
+  if(!okPin) return;
+  const name = (el("newNightName").value || "").trim();
+  if(!name) return alert("Type a night name first.");
+  if(store.nights[name]) return alert("That night already exists. Choose a different name.");
+  store.nights[name] = deepClone(DEFAULT_CONFIG);
+  store.nights[name].nightLabel = name;
+  if(!store.nights[name].pars) store.nights[name].pars = {};
+  store.activeNightId = name;
+  await saveStore();
+  el("newNightName").value = "";
+  await switchNight(name);
+}
+async function deleteNight(){
+  const okPin = await requirePin("delete night");
+  if(!okPin) return;
+  const ids = Object.keys(store.nights);
+  if(ids.length <= 1) return alert("You must keep at least one night.");
+  const label = store.nights[activeNightId]?.nightLabel || activeNightId;
+  if(!confirm(`Delete "${label}"? This removes config + counts for that night.`)) return;
+
+  await deleteNightState(activeNightId);
+  await deleteNightLog(activeNightId);
+  delete store.nights[activeNightId];
+
+  const nextId = Object.keys(store.nights)[0];
+  store.activeNightId = nextId;
+  await saveStore();
+  await switchNight(nextId);
+}
+
+/* Items editor */
+function renderItemsTextarea(){
+  el("itemsTextarea").value = (CONFIG.items || []).join("\n");
+}
+function renderItemsList(){
+  const root = el("itemsList");
+  if(!root) return;
+  root.innerHTML = "";
+  (CONFIG.items || []).forEach((item, idx) => {
+    const row = document.createElement("div");
+    row.className = "itemRow";
+    row.innerHTML = `
+      <div class="name">${escapeHtml(item)}</div>
+      <div class="actions">
+        <button class="btnGray mini" data-ed="${idx}" title="Rename item">✏️</button>
+        <button class="btnRed mini" data-rm="${idx}" title="Remove item">🗑</button>
+      </div>
+    `;
+    root.appendChild(row);
+  });
+
+  root.querySelectorAll("button[data-ed]").forEach(btn=>{
+    btn.onclick = async () => {
+      const okPin = await requirePin("rename item");
+      if(!okPin) return;
+      const idx = Number(btn.getAttribute("data-ed"));
+      await renameItemByIndex(idx);
+    };
+  });
+
+  root.querySelectorAll("button[data-rm]").forEach(btn=>{
+    btn.onclick = async () => {
+      const okPin = await requirePin("remove item");
+      if(!okPin) return;
+      const idx = Number(btn.getAttribute("data-rm"));
+      await removeItemByIndex(idx);
+    };
+  });
+}
+async function addQuickItem(){
+  const okPin = await requirePin("add item");
+  if(!okPin) return;
+  const inp = el("quickAddItem");
+  const name = (inp.value || "").trim();
+  if(!name) return;
+  CONFIG.items = normalizeItems([...(CONFIG.items||[]), name]);
+  inp.value = "";
+
+  store.nights[activeNightId] = CONFIG;
+  await saveStore();
+  state = await ensureState();
+  await pruneStateToItems(CONFIG.items);
+
+  renderItemsTextarea();
+  renderItemsList();
+  renderAll();
+  toast("Item added.");
+}
+async function removeItemByIndex(idx){
+  const cur = CONFIG.items || [];
+  if(idx < 0 || idx >= cur.length) return;
+  const name = cur[idx];
+  if(!confirm(`Remove "${name}" from this night? (Counts for this item will be removed.)`)) return;
+  cur.splice(idx, 1);
+  CONFIG.items = normalizeItems(cur);
+
+  store.nights[activeNightId] = CONFIG;
+  await saveStore();
+  await pruneStateToItems(CONFIG.items);
+  log = log.filter(e => String(e.item).toLowerCase() !== String(name).toLowerCase());
+  await saveNightLog(activeNightId, log);
+
+  state = await ensureState();
+  renderItemsTextarea();
+  renderItemsList();
+  renderAll();
+  toast("Item removed.");
+}
+
+function findItemIndexCaseInsensitive(name){
+  const key = String(name||"").trim().toLowerCase();
+  if(!key) return -1;
+  return (CONFIG.items || []).findIndex(x => String(x).toLowerCase() === key);
+}
+
+async function renameItemByIndex(idx){
+  const cur = CONFIG.items || [];
+  if(idx < 0 || idx >= cur.length) return;
+  const oldName = cur[idx];
+  const nextName = (prompt(`Rename item:\n\n${oldName}\n\nto:`, oldName) || "").trim();
+  if(!nextName) return;
+  const oldKey = String(oldName).toLowerCase();
+  const nextKey = String(nextName).toLowerCase();
+  if(oldKey === nextKey) return;
+
+  const existingIdx = findItemIndexCaseInsensitive(nextName);
+
+  if(existingIdx >= 0 && existingIdx != idx){
+    cur.splice(idx, 1);
+  }else{
+    cur[idx] = nextName;
+  }
+  CONFIG.items = normalizeItems(cur);
+
+  for(const b of Object.keys(state||{})){
+    for(const st of Object.keys(state[b]||{})){
+      const bucket = state[b][st] || {};
+      const actualOldKey = Object.keys(bucket).find(k=>String(k).toLowerCase()===oldKey);
+      if(!actualOldKey) continue;
+      const oldVal = bucket[actualOldKey];
+      if(!oldVal) continue;
+      const actualNewKey = Object.keys(bucket).find(k=>String(k).toLowerCase()===nextKey);
+      if(actualNewKey){
+        bucket[actualNewKey].taken += oldVal.taken||0;
+        bucket[actualNewKey].returned += oldVal.returned||0;
+      }else{
+        bucket[nextName] = { taken: oldVal.taken||0, returned: oldVal.returned||0 };
+      }
+      delete bucket[actualOldKey];
+    }
+  }
+
+  for(const e of log){
+    if(String(e.item||"").toLowerCase() === oldKey) e.item = nextName;
+  }
+
+  store.nights[activeNightId] = CONFIG;
+  await saveStore();
+  await saveNightState(activeNightId, state);
+  await saveNightLog(activeNightId, log);
+
+  state = await ensureState();
+
+  renderItemsTextarea();
+  renderItemsList();
+  renderAll();
+  toast("Item renamed.");
+}
+
+async function applyItemsFromTextarea(){
+  const okPin = await requirePin("edit items");
+  if(!okPin) return;
+  const lines = (el("itemsTextarea").value || "")
+    .split(/\r?\n/)
+    .map(s=>s.trim());
+  const next = normalizeItems(lines);
+  if(!next.length) return alert("Add at least one item.");
+  CONFIG.items = next;
+
+  store.nights[activeNightId] = CONFIG;
+  await saveStore();
+  state = await ensureState();
+  await pruneStateToItems(CONFIG.items);
+
+  renderItemsTextarea();
+  renderItemsList();
+  renderAll();
+  toast("Items updated.");
+}
+
+/* =========================
+   Start-of-night bucket
+========================= */
+function parseBucket(text){
+  const lines = String(text||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const out = [];
+  for(const line of lines){
+    let m = line.match(/^(\d+)\s+(.+)$/);
+    if(m){ out.push({qty: clampInt(m[1],1,9999), name: m[2].trim()}); continue; }
+    m = line.match(/^(.+?)\s*[:=]\s*(\d+)\s*$/);
+    if(m){ out.push({qty: clampInt(m[2],1,9999), name: m[1].trim()}); continue; }
+    m = line.match(/^(.+?)\s+(\d+)\s*$/);
+    if(m){ out.push({qty: clampInt(m[2],1,9999), name: m[1].trim()}); continue; }
+    out.push({qty: 1, name: line});
+  }
+  const map = new Map();
+  for(const it of out){
+    const key = it.name.toLowerCase();
+    map.set(key, {name: it.name, qty: (map.get(key)?.qty||0) + it.qty});
+  }
+  return [...map.values()];
+}
+function resolveItemName(inputName){
+  const key = String(inputName||"").trim().toLowerCase();
+  if(!key) return null;
+  const found = (CONFIG.items||[]).find(x=>String(x).toLowerCase()===key);
+  return found || null;
+}
+async function ensureBucketItemsExist(bucket){
+  const missing = bucket.filter(x => !resolveItemName(x.name));
+  if(!missing.length) return true;
+  const list = missing.map(x=>x.name).join(", ");
+  if(!confirm(`These items are not in your Items list:\n\n${list}\n\nAdd them automatically?`)) return false;
+  CONFIG.items = normalizeItems([...(CONFIG.items||[]), ...missing.map(x=>x.name)]);
+  store.nights[activeNightId] = CONFIG;
+  await saveStore();
+  state = await ensureState();
+  renderItemsTextarea();
+  renderItemsList();
+  renderAll();
+  return true;
+}
+async function applyBucketToTargets(target){
+  if(isLocked()) return;
+  const okPin = await requirePin("apply bucket");
+  if(!okPin) return;
+
+  const bucket = parseBucket(el("bucketTextarea")?.value || "");
+  if(!bucket.length) return alert("Bucket list is empty.");
+  const okItems = await ensureBucketItemsExist(bucket);
+  if(!okItems) return;
+
+  if(!confirm("This will ADD to Taken counts. Continue?")) return;
+
+  const targets = [];
+  if(target === "all"){
+    for(const sec of CONFIG.sections){
+      for(const st of sec.stations){
+        targets.push({bar: sec.bar, station: st.station});
+      }
+    }
+  }else{
+    targets.push({bar, station});
+  }
+
+  for(const t of targets){
+    for(const bIt of bucket){
+      const itemName = resolveItemName(bIt.name) || bIt.name;
+      state[t.bar] ||= {};
+      state[t.bar][t.station] ||= {};
+      state[t.bar][t.station][itemName] ||= {taken:0, returned:0};
+      state[t.bar][t.station][itemName].taken += bIt.qty;
+      log.push({ ts: new Date().toISOString(), bar: t.bar, station: t.station, item: itemName, action: "taken", qty: bIt.qty, note: "bucket" });
+    }
+  }
+
+  await saveNightState(activeNightId, state);
+  await saveNightLog(activeNightId, log);
+  renderAll();
+  toast(target==="all" ? "Bucket applied to all stations." : "Bucket applied to current station.");
+}
+async function saveDefaultBucket(){
+  const okPin = await requirePin("save default bucket");
+  if(!okPin) return;
+  store.global.defaultBucketText = el("bucketTextarea")?.value || "";
+  await saveStore();
+  toast("Default bucket saved.");
+}
+function loadDefaultBucket(){
+  el("bucketTextarea").value = store.global.defaultBucketText || "";
+  toast("Default bucket loaded.");
+}
+
+/* =========================
+   Bars editor
+========================= */
+function renderBarsEditor(){
+  const root = el("barsEditor");
+  root.innerHTML = "";
+
+  CONFIG.sections.forEach((sec, secIdx) => {
+    const wrap = document.createElement("div");
+    wrap.className = "stCard";
+
+    const head = document.createElement("div");
+    head.className = "flex";
+    head.style.justifyContent = "space-between";
+    head.innerHTML = `
+      <div class="flex" style="gap:8px;">
+        <span class="badge">Bar</span>
+        <input data-k="bar" data-sec="${secIdx}" value="${escapeHtml(sec.bar)}" style="min-width:140px;" />
+      </div>
+      <div class="rightFlex">
+        <button class="btnBlue miniBtn" data-act="addStation" data-sec="${secIdx}">+ Station</button>
+        <button class="btnRed miniBtn" data-act="removeBar" data-sec="${secIdx}">Remove Bar</button>
+      </div>
+    `;
+    wrap.appendChild(head);
+
+    const stationsWrap = document.createElement("div");
+    stationsWrap.className = "stGrid";
+    stationsWrap.style.marginTop = "10px";
+
+    sec.stations.forEach((st, stIdx) => {
+      const c = document.createElement("div");
+      c.className = "stCard";
+      c.innerHTML = `
+        <h3>Station</h3>
+        <div class="fields">
+          <div>
+            <label>Station label</label>
+            <input data-k="station" data-sec="${secIdx}" data-st="${stIdx}" value="${escapeHtml(st.station || "")}" placeholder="Bartender 1" />
+          </div>
+          <div>
+            <label>Bartender name (optional)</label>
+            <input data-k="bartender_name" data-sec="${secIdx}" data-st="${stIdx}" value="${escapeHtml(st.bartender_name || "")}" placeholder="" />
+          </div>
+          <div>
+            <label>Barback (optional)</label>
+            <input data-k="barback" data-sec="${secIdx}" data-st="${stIdx}" value="${escapeHtml(st.barback || "")}" placeholder="" />
+          </div>
+          <div>
+            <label>Placement (optional)</label>
+            <input data-k="placement" data-sec="${secIdx}" data-st="${stIdx}" value="${escapeHtml(st.placement || "")}" placeholder="P1" />
+          </div>
+          <div style="grid-column:1/-1">
+            <label>Bars label (optional)</label>
+            <input data-k="bars_label" data-sec="${secIdx}" data-st="${stIdx}" value="${escapeHtml(st.bars_label || "")}" placeholder="Leave blank to auto: BAR / Station" />
+          </div>
+        </div>
+        <div class="rightFlex" style="margin-top:10px;">
+          <button class="btnRed miniBtn" data-act="removeStation" data-sec="${secIdx}" data-st="${stIdx}">Remove Station</button>
+        </div>
+      `;
+      stationsWrap.appendChild(c);
+    });
+
+    wrap.appendChild(stationsWrap);
+    root.appendChild(wrap);
+  });
+
+  root.querySelectorAll("button[data-act]").forEach(btn=>{
+    btn.onclick = async () => {
+      const okPin = await requirePin("edit bars/stations");
+      if(!okPin) return;
+      const act = btn.getAttribute("data-act");
+      const secIdx = Number(btn.getAttribute("data-sec"));
+      const stIdx = btn.getAttribute("data-st") !== null ? Number(btn.getAttribute("data-st")) : null;
+      if(act==="addStation") addStation(secIdx);
+      if(act==="removeBar") removeBar(secIdx);
+      if(act==="removeStation") removeStation(secIdx, stIdx);
+      renderBarsEditor();
+      renderQuickNames();
+    };
+  });
+
+  root.querySelectorAll("input[data-k]").forEach(inp=>{
+    inp.oninput = () => {
+      const k = inp.getAttribute("data-k");
+      const secIdx = Number(inp.getAttribute("data-sec"));
+      const stIdxAttr = inp.getAttribute("data-st");
+      if(stIdxAttr === null){
+        CONFIG.sections[secIdx][k] = inp.value;
+      }else{
+        const stIdx = Number(stIdxAttr);
+        CONFIG.sections[secIdx].stations[stIdx][k] = inp.value;
+      }
+      renderQuickNames();
+    };
+  });
+}
+function addBar(){
+  const nextNum = CONFIG.sections.length + 1;
+  CONFIG.sections.push({
+    bar: `B${nextNum}`,
+    stations: [{ station:"Bartender 1", bartender_name:"", barback:"", placement:"P1", bars_label:"" }]
+  });
+}
+function removeBar(secIdx){
+  if(CONFIG.sections.length <= 1) return alert("Keep at least one bar.");
+  CONFIG.sections.splice(secIdx, 1);
+}
+function addStation(secIdx){
+  const sec = CONFIG.sections[secIdx];
+  const nextNum = sec.stations.length + 1;
+  sec.stations.push({ station:`Bartender ${nextNum}`, bartender_name:"", barback:"", placement:`P${nextNum}`, bars_label:"" });
+}
+function removeStation(secIdx, stIdx){
+  const sec = CONFIG.sections[secIdx];
+  if(sec.stations.length <= 1) return alert("Keep at least one station per bar.");
+  sec.stations.splice(stIdx, 1);
+}
+
+async function saveSetup(){
+  const okPin = await requirePin("save setup");
+  if(!okPin) return;
+
+  CONFIG.items = normalizeItems(CONFIG.items || []);
+  CONFIG.sections = (CONFIG.sections || [])
+    .map(sec => ({
+      group: (sec.group||"").trim() || "Group 1",
+      bar: (sec.bar||"").trim() || "BAR",
+      stations: (sec.stations||[])
+        .map(st => ({
+          station: (st.station||"").trim() || "Station",
+          bartender_name: (st.bartender_name||"").trim(),
+          barback: (st.barback||"").trim(),
+          placement: (st.placement||"").trim(),
+          bars_label: (st.bars_label||"").trim()
+        }))
+    }))
+    .filter(sec => sec.bar);
+
+  if(!CONFIG.items.length) CONFIG.items = deepClone(DEFAULT_CONFIG.items);
+  if(!CONFIG.sections.length) CONFIG.sections = deepClone(DEFAULT_CONFIG.sections);
+
+  store.nights[activeNightId] = CONFIG;
+  await saveStore();
+
+  state = await ensureState();
+
+  if(!CONFIG.sections.find(s=>s.bar===bar)){
+    bar = CONFIG.sections[0]?.bar || bar;
+  }
+  const sec = CONFIG.sections.find(s=>s.bar===bar) || CONFIG.sections[0];
+  if(sec && !sec.stations.find(s=>s.station===station)){
+    station = sec.stations[0]?.station || station;
+  }
+
+  renderAll();
+  toast("Setup saved.");
+}
+
+function renderSetup(){
+  renderNightSelect();
+  renderItemsTextarea();
+  renderItemsList();
+  renderQuickNames();
+  const bta = el("bucketTextarea");
+  if(bta && !bta.value.trim() && (store.global.defaultBucketText||"").trim()){
+    bta.value = store.global.defaultBucketText;
+  }
+  renderBarsEditor();
+  renderParLevelsList();
+  renderCopyFromSelect();
+  updatePinStatus();
+}
+
+/* =========================
+   Backup / Restore
+========================= */
+async function exportBackup(){
+  const okPin = await requirePin("export backup");
+  if(!okPin) return;
+  const out = {
+    app: "Inventory Clicker",
+    schemaVersion: 3,
+    exportedAt: new Date().toISOString(),
+    store: store,
+    nightData: {}
+  };
+  for(const nid of Object.keys(store.nights)){
+    out.nightData[nid] = {
+      state: await loadNightState(nid),
+      log: await loadNightLog(nid)
+    };
+  }
+  const filePart = safeFilePart(store.activeNightId || "backup");
+  downloadText(`inventory_backup_${filePart}.json`, JSON.stringify(out, null, 2), "application/json;charset=utf-8");
+}
+async function restoreBackupFromFile(file){
+  if(!file) return;
+  if(hasPin()){
+    const okPin = await requirePin("restore backup");
+    if(!okPin) return;
+  }
+  const text = await file.text();
+  let obj = null;
+  try{ obj = JSON.parse(text); }catch(e){ return alert("Invalid JSON file."); }
+  if(!obj || !obj.store || !obj.store.nights || !obj.nightData) return alert("Backup file does not match this app.");
+
+  if(!confirm("Restore this backup? This will overwrite current nights, counts, and settings.")) return;
+
+  store = obj.store;
+  store.global ||= {pinHash:"", defaultBucketText:""};
+  if(typeof store.global.defaultBucketText !== "string") store.global.defaultBucketText = "";
+  store.activeNightId ||= Object.keys(store.nights)[0] || DEFAULT_NIGHT_ID;
+
+  // ── Migrate old backups: back-fill group field ──
+  for(const [nid, cfg] of Object.entries(store.nights)){
+    if(!cfg.sections) cfg.sections = [];
+    // If ALL sections lack group → assign default "Group 1"
+    const hasAnyGroup = cfg.sections.some(s => s.group && s.group.trim());
+    if(!hasAnyGroup){
+      cfg.sections.forEach(s => { if(!s.group) s.group = "Group 1"; });
+    }
+    // Also ensure pars exists
+    if(!cfg.pars) cfg.pars = {};
+  }
+
+  await saveStore();
+
+  for(const nid of Object.keys(store.nights)){
+    const nd = obj.nightData[nid] || {};
+    if(nd.state) await saveNightState(nid, nd.state);
+    else await deleteNightState(nid);
+    if(Array.isArray(nd.log)) await saveNightLog(nid, nd.log);
+    else await deleteNightLog(nid);
+  }
+
+  _curGroup = null;
+  await switchNight(store.activeNightId);
+  closeSetup();
+  toast("Backup restored successfully.");
+}
+
+/* =========================
+   Wire UI
+========================= */
+el("search").addEventListener("input", renderItems);
+el("logSearch")?.addEventListener("input", renderLog);
+const qtyEl = el("qty");
+if(qtyEl){
+  qtyEl.addEventListener("change", ()=>{ qtyEl.value = String(getQty()); });
+  qtyEl.addEventListener("keydown", (e)=>{ 
+    if(e.key==="Enter"){ e.preventDefault(); qtyEl.blur(); }
+  });
+}
+
+el("exportSheetBtn").onclick = exportSheetStyle;
+el("exportReportBtn").onclick = exportReportHtml;
+el("exportLogBtn").onclick = exportLog;
+
+el("undoBtn").onclick = undo;
+el("resetBtn").onclick = resetNight;
+
+el("lockBtn").onclick = toggleLock;
+
+el("setupBtn").onclick = async () => {
+  if(isLocked()) return;
+  const okPin = await requirePin("open setup");
+  if(!okPin) return;
+  openSetup();
+};
+
+el("startNightBtn").onclick = async () => {
+  if(isLocked()) return;
+  const okPin = await requirePin("start of night");
+  if(!okPin) return;
+  openSetup();
+  setTimeout(()=>{ el("startNightBox")?.scrollIntoView({behavior:"smooth", block:"start"}); }, 50);
+};
+
+el("closeSetupBtn").onclick = closeSetup;
+el("closeSetupTop").onclick = closeSetup;
+el("setupBackdrop").addEventListener("click", (e)=>{ if(e.target === el("setupBackdrop")) closeSetup(); });
+document.addEventListener("keydown", (e)=>{ if(e.key==="Escape" && el("setupBackdrop").style.display==="flex") closeSetup(); });
+
+el("createNightBtn").onclick = createNight;
+el("deleteNightBtn").onclick = deleteNight;
+
+el("applyItemsBtn").onclick = applyItemsFromTextarea;
+const _qAddBtn = el("quickAddItemBtn");
+if(_qAddBtn) _qAddBtn.onclick = addQuickItem;
+const _qAddInp = el("quickAddItem");
+if(_qAddInp) _qAddInp.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); addQuickItem(); } });
+
+el("applyBucketAllBtn").onclick = ()=> applyBucketToTargets("all");
+el("applyBucketCurrentBtn").onclick = ()=> applyBucketToTargets("current");
+el("saveDefaultBucketBtn").onclick = saveDefaultBucket;
+el("loadDefaultBucketBtn").onclick = loadDefaultBucket;
+
+// One-click: Load DEFAULT bucket and apply to ALL stations (Taken)
+el("applyDefaultBucketNowBtn").onclick = async () => {
+  const okPin = await requirePin("apply default bucket");
+  if(!okPin) return;
+  loadDefaultBucket();
+  applyBucketToTargets("all");
+  toast("Default bucket applied to ALL stations.");
+};
+
+
+/* addGroupBtn wired in new features block */
+el("saveSetupBtn").onclick = async ()=>{ await saveSetup(); closeSetup(); };
+
+el("setPinBtn").onclick = setOrChangePin;
+el("clearPinBtn").onclick = clearPin;
+
+el("backupBtn").onclick = exportBackup;
+el("restoreBtn").onclick = ()=> el("restoreFile").click();
+el("restoreFile").addEventListener("change", async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  await restoreBackupFromFile(file);
+});
+
+/* =====================================================================
+   NEW FEATURES BLOCK — initialized before Init so overrides are in place
+===================================================================== */
+
+/* ---- Group state (var so it's accessible from patched functions above) ---- */
+var _curGroup = null;
+
+function _allGroups(){
+  const seen=new Set(), out=[];
+  for(const sec of CONFIG.sections||[]){
+    const g=sec.group||"Group 1";
+    if(!seen.has(g)){seen.add(g);out.push(g);}
+  }
+  return out.length?out:["Group 1"];
+}
+function _ensureGroups(){
+  for(const sec of CONFIG.sections||[]) if(!sec.group) sec.group="Group 1";
+  const gs=_allGroups();
+  if(!_curGroup||!gs.includes(_curGroup)) _curGroup=gs[0]||"Group 1";
+}
+function renderGroups(){
+  _ensureGroups();
+  const wrap=el("groupTabs"); if(!wrap)return;
+  wrap.innerHTML="";
+  for(const g of _allGroups()){
+    const d=document.createElement("div");
+    d.className="grouptab"+(g===_curGroup?" active":"");
+    d.textContent=g;
+    d.onclick=()=>{
+      _curGroup=g;
+      const fs=CONFIG.sections.find(s=>s.group===_curGroup);
+      if(fs){bar=fs.bar;station=(fs.stations[0]||{}).station||station;}
+      renderAll();
+    };
+    wrap.appendChild(d);
+  }
+}
+
+/* ---- Par levels ---- */
+function getPar(item){return Number((CONFIG.pars||{})[item])||0;}
+function setPar(item,val){
+  if(!CONFIG.pars)CONFIG.pars={};
+  val=clampInt(val,0,99999);
+  if(val===0)delete CONFIG.pars[item]; else CONFIG.pars[item]=val;
+}
+function renderParLevelsList(){
+  const root=el("parLevelsList"); if(!root)return;
+  root.innerHTML="";
+  for(const item of CONFIG.items||[]){
+    const row=document.createElement("div"); row.className="itemRow";
+    row.innerHTML=`<div class="name">${escapeHtml(item)}</div>
+      <input type="number" min="0" step="1" value="${getPar(item)}" data-par="${escapeHtml(item)}"
+        title="Expected NET (0=off)" style="width:72px;text-align:center;padding:6px 8px;font-size:13px;border-radius:10px;"/>`;
+    root.appendChild(row);
+  }
+  root.querySelectorAll("input[data-par]").forEach(inp=>{
+    inp.oninput=()=>setPar(inp.getAttribute("data-par"),inp.value);
+  });
+}
+
+/* ---- Copy-from ---- */
+function renderCopyFromSelect(){
+  const sel=el("copyFromSelect"); if(!sel)return;
+  sel.innerHTML='<option value="">— pick a night —</option>';
+  for(const [id,cfg] of Object.entries(store.nights)){
+    if(id===activeNightId)continue;
+    const opt=document.createElement("option");
+    opt.value=id; opt.textContent=cfg.nightLabel||id; sel.appendChild(opt);
+  }
+}
+el("copySetupBtn").onclick=async()=>{
+  const srcId=el("copyFromSelect").value;
+  if(!srcId){alert("Select a source night.");return;}
+  const ok=await requirePin("copy setup"); if(!ok)return;
+  const src=store.nights[srcId]; if(!src)return;
+  if(!confirm(`Copy groups, bars & items from "${src.nightLabel||srcId}"?\n\nCounts will NOT change.`))return;
+  CONFIG.sections=deepClone(src.sections||[]);
+  CONFIG.items=deepClone(src.items||[]);
+  CONFIG.pars=deepClone(src.pars||{});
+  store.nights[activeNightId]=CONFIG;
+  await saveStore(); state=await ensureState();
+  _curGroup=null; _ensureGroups();
+  renderAll(); renderSetup();
+  toast("Setup copied from "+(src.nightLabel||srcId)+".");
+};
+
+/* ---- renderBarsEditor override ---- */
+renderBarsEditor = function(){
+  _ensureGroups();
+  const root=el("barsEditor"); root.innerHTML="";
+  for(const grp of _allGroups()){
+    const secsInGrp=CONFIG.sections.filter(s=>(s.group||"Group 1")===grp);
+    const grpWrap=document.createElement("div"); grpWrap.className="groupCard";
+    const grpHead=document.createElement("div"); grpHead.className="groupCardHead";
+    grpHead.innerHTML=`
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span class="badge">🏢 Group</span>
+        <input class="grpNameInp" data-old="${escapeHtml(grp)}" value="${escapeHtml(grp)}"
+          placeholder="Group name" style="min-width:150px;font-weight:800;font-size:13px;"/>
+      </div>
+      <div class="rightFlex" style="gap:8px;">
+        <button class="btnBlue miniBtn" data-act="addBar" data-grp="${escapeHtml(grp)}">+ Add Bar</button>
+        <button class="btnRed  miniBtn" data-act="rmGrp"  data-grp="${escapeHtml(grp)}">Remove Group</button>
+      </div>`;
+    grpWrap.appendChild(grpHead);
+    grpHead.querySelector(".grpNameInp").oninput=function(){
+      const oldG=this.getAttribute("data-old"),newG=this.value||"Group";
+      for(const sec of CONFIG.sections) if(sec.group===oldG) sec.group=newG;
+      if(_curGroup===oldG)_curGroup=newG;
+      this.setAttribute("data-old",newG);
+      renderGroups(); renderQuickNames();
+    };
+    const barsWrap=document.createElement("div"); barsWrap.className="stGrid";
+    secsInGrp.forEach(sec=>{
+      const si=CONFIG.sections.indexOf(sec);
+      const bc=document.createElement("div"); bc.className="stCard";
+      const bh=document.createElement("div"); bh.className="flex"; bh.style.justifyContent="space-between";
+      bh.innerHTML=`
+        <div class="flex" style="gap:6px;">
+          <span class="badge">🍺 Bar</span>
+          <input data-k="bar" data-sec="${si}" value="${escapeHtml(sec.bar)}"
+            style="min-width:130px;" placeholder="Bar name"/>
+        </div>
+        <div class="rightFlex" style="gap:6px;">
+          <button class="btnBlue miniBtn" data-act="addSt" data-sec="${si}">+ Bartender</button>
+          <button class="btnRed  miniBtn" data-act="rmBar" data-sec="${si}">Remove Bar</button>
+        </div>`;
+      bc.appendChild(bh);
+      const sw=document.createElement("div"); sw.className="stGrid"; sw.style.marginTop="10px";
+      sec.stations.forEach((st,sti)=>{
+        const c=document.createElement("div"); c.className="stCard";
+        c.innerHTML=`<h3>Bartender ${sti+1}</h3>
+          <div class="fields">
+            <div><label>Station label</label>
+              <input data-k="station" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.station||"")}" placeholder="Bartender 1"/></div>
+            <div><label>Bartender name</label>
+              <input data-k="bartender_name" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.bartender_name||"")}" placeholder="(optional)"/></div>
+            <div><label>Barback</label>
+              <input data-k="barback" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.barback||"")}" placeholder="(optional)"/></div>
+            <div><label>Placement</label>
+              <input data-k="placement" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.placement||"")}" placeholder="P1"/></div>
+            <div style="grid-column:1/-1"><label>Bars label (blank=auto)</label>
+              <input data-k="bars_label" data-sec="${si}" data-st="${sti}" value="${escapeHtml(st.bars_label||"")}" placeholder="Auto: Bar/Station"/></div>
+          </div>
+          <div class="rightFlex" style="margin-top:8px;">
+            <button class="btnRed miniBtn" data-act="rmSt" data-sec="${si}" data-st="${sti}">Remove</button>
+          </div>`;
+        sw.appendChild(c);
+      });
+      bc.appendChild(sw); barsWrap.appendChild(bc);
+    });
+    grpWrap.appendChild(barsWrap); root.appendChild(grpWrap);
+  }
+  root.querySelectorAll("input[data-k]").forEach(inp=>{
+    inp.oninput=()=>{
+      const k=inp.getAttribute("data-k"),si=+inp.getAttribute("data-sec"),sti=inp.getAttribute("data-st");
+      if(sti===null)CONFIG.sections[si][k]=inp.value;
+      else CONFIG.sections[si].stations[+sti][k]=inp.value;
+      renderQuickNames();
+    };
+  });
+  root.querySelectorAll("button[data-act]").forEach(btn=>{
+    btn.onclick=async()=>{
+      const ok=await requirePin("edit structure"); if(!ok)return;
+      const act=btn.getAttribute("data-act"),grp=btn.getAttribute("data-grp");
+      const si=btn.getAttribute("data-sec")!=null?+btn.getAttribute("data-sec"):null;
+      const sti=btn.getAttribute("data-st")!=null?+btn.getAttribute("data-st"):null;
+      if(act==="addBar"){
+        const n=CONFIG.sections.filter(s=>s.group===grp).length+1;
+        const last=CONFIG.sections.reduce((a,s,i)=>s.group===grp?i:a,-1);
+        const ns={group:grp,bar:`Bar ${n}`,stations:[{station:"Bartender 1",bartender_name:"",barback:"",placement:"P1",bars_label:""}]};
+        if(last>=0)CONFIG.sections.splice(last+1,0,ns); else CONFIG.sections.push(ns);
+      }else if(act==="rmGrp"){
+        const inG=CONFIG.sections.filter(s=>s.group===grp);
+        if(CONFIG.sections.length<=inG.length){alert("Keep at least one bar total.");return;}
+        if(!confirm(`Remove group "${grp}" and all its bars?`))return;
+        CONFIG.sections=CONFIG.sections.filter(s=>s.group!==grp);
+        if(_curGroup===grp){_curGroup=null;_ensureGroups();}
+      }else if(act==="addSt"){
+        const n=CONFIG.sections[si].stations.length+1;
+        CONFIG.sections[si].stations.push({station:`Bartender ${n}`,bartender_name:"",barback:"",placement:`P${n}`,bars_label:""});
+      }else if(act==="rmBar"){
+        if(CONFIG.sections.length<=1){alert("Keep at least one bar.");return;}
+        CONFIG.sections.splice(si,1);
+      }else if(act==="rmSt"){
+        if(CONFIG.sections[si].stations.length<=1){alert("Keep at least one bartender per bar.");return;}
+        CONFIG.sections[si].stations.splice(sti,1);
+      }
+      renderBarsEditor(); renderQuickNames();
+    };
+  });
+};
+
+el("addGroupBtn").onclick=async()=>{
+  const ok=await requirePin("add group"); if(!ok)return;
+  const n=_allGroups().length+1;
+  CONFIG.sections.push({group:`Group ${n}`,bar:"Bar 1",
+    stations:[{station:"Bartender 1",bartender_name:"",barback:"",placement:"P1",bars_label:""}]});
+  renderBarsEditor(); renderQuickNames();
+};
+
+el("importCsvBarsBtn").onclick=()=>el("csvBarsFile").click();
+el("csvBarsFile").addEventListener("change",async e=>{
+  const file=e.target.files&&e.target.files[0]; e.target.value=""; if(!file)return;
+  const ok=await requirePin("import CSV"); if(!ok)return;
+  const text=await file.text();
+  const lines=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  if(lines.length<2){alert("Need header + at least one data row.");return;}
+  const hdr=lines[0].split(",").map(h=>h.replace(/^"|"$/g,"").trim().toLowerCase());
+  const gi=hdr.findIndex(h=>h.includes("group")),bi=hdr.findIndex(h=>h.includes("bar")),si=hdr.findIndex(h=>h.includes("station"));
+  const bti=hdr.findIndex(h=>h.includes("bartender")||h==="name"),bbi=hdr.findIndex(h=>h.includes("barback")),pi=hdr.findIndex(h=>h.includes("placement"));
+  if(bi<0||si<0){alert("CSV must have 'Bar' and 'Station' columns.");return;}
+  const secMap={};
+  for(const line of lines.slice(1)){
+    const cols=line.split(",").map(c=>c.replace(/^"|"$/g,"").trim());
+    const grp=gi>=0?(cols[gi]||"Group 1"):"Group 1",bName=cols[bi]||"Bar 1",stName=cols[si]||"Station";
+    const key=grp+"|||"+bName;
+    if(!secMap[key])secMap[key]={group:grp,bar:bName,stations:[]};
+    secMap[key].stations.push({station:stName,bartender_name:bti>=0?cols[bti]:"",barback:bbi>=0?cols[bbi]:"",placement:pi>=0?cols[pi]:"",bars_label:""});
+  }
+  const sections=Object.values(secMap);
+  if(!sections.length){alert("No valid rows.");return;}
+  if(!confirm(`Import ${sections.length} bar(s) from CSV? Replaces current bars.`))return;
+  CONFIG.sections=sections;_curGroup=null;_ensureGroups();
+  renderBarsEditor();renderQuickNames();toast(`Imported ${sections.length} bars.`);
+});
+
+/* ---- Bar Summary ---- */
+function exportBarSummary(){
+  const nt=CONFIG.nightLabel||activeNightId;
+  const css=`:root{--bg:#0b1220;--card:#111a2e;--line:#203056;--muted:#a9b6d6;--text:#e8eefc}*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);padding:16px}.pBtn{border-radius:12px;border:1px solid #2a3d6b;background:#1a3cff;color:#fff;padding:10px 14px;font-weight:700;cursor:pointer;margin-bottom:14px}.grpT{font-size:18px;font-weight:900;margin:16px 0 4px;color:#9fd3ff}.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:8px 0}.barT{font-size:15px;font-weight:800}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{border-bottom:1px solid #22325b;padding:8px 6px;text-align:left}th{color:var(--muted);font-weight:600}.r{text-align:right}@media print{body{background:#fff;color:#000}.sec{background:#fff;border-color:#ccc}.pBtn{display:none}}`;
+  let body="";
+  for(const grp of _allGroups()){
+    body+=`<div class="grpT">🏢 ${escapeHtml(grp)}</div>`;
+    for(const sec of CONFIG.sections.filter(s=>(s.group||"Group 1")===grp)){
+      let tT=0,tR=0;
+      const rows=CONFIG.items.map(item=>{let t=0,r=0;for(const st of sec.stations){const e=state?.[sec.bar]?.[st.station]?.[item]||{};t+=(e.taken||0);r+=(e.returned||0);}tT+=t;tR+=r;return{item,t,r,n:t-r};}).sort((a,b)=>Math.abs(b.n)-Math.abs(a.n));
+      body+=`<div class="sec"><div class="barT">🍺 ${escapeHtml(sec.bar)}</div><div style="font-size:12px;color:var(--muted)">All bartenders combined — Taken:${tT} Returned:${tR} Net:${tT-tR}</div><table><thead><tr><th>Item</th><th class="r">Taken</th><th class="r">Returned</th><th class="r">Net</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${escapeHtml(r.item)}</td><td class="r"><b>${r.t}</b></td><td class="r"><b>${r.r}</b></td><td class="r"><b>${r.n}</b></td></tr>`).join("")}</tbody></table></div>`;
+    }
+  }
+  downloadText(`bar_summary_${safeFilePart(nt)}.html`,`<!doctype html><html><head><meta charset="utf-8"/><title>Bar Summary</title><style>${css}</style></head><body><button class="pBtn" onclick="window.print()">🖨️ Print / Save PDF</button><h1>📊 Bar Summary</h1><div style="color:var(--muted);font-size:12px;margin-bottom:14px">Night: <b>${escapeHtml(nt)}</b></div>${body}
+<div id="apiLoginBackdrop" style="position:fixed;inset:0;background:rgba(10,15,25,.72);display:none;align-items:center;justify-content:center;z-index:99999;">
+  <div style="width:min(420px,92vw);background:#111827;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.35);">
+    <div style="font-size:20px;font-weight:800;margin-bottom:8px;">Inventory Login</div>
+    <div style="opacity:.8;margin-bottom:14px;">Login to sync this device with cloud inventory.</div>
+
+    <label style="display:block;margin-bottom:8px;">Username</label>
+    <input id="apiLoginUsername" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:12px;" />
+
+    <label style="display:block;margin-bottom:8px;">PIN</label>
+    <input id="apiLoginPin" type="password" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:14px;" />
+
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <button id="apiLoginBtn" style="padding:12px 16px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer;">Login</button>
+      <button id="apiSkipBtn" style="padding:12px 16px;border:1px solid #475569;border-radius:12px;background:transparent;color:#fff;cursor:pointer;">Local Only</button>
+      <div id="apiLoginMsg" style="font-size:13px;color:#fca5a5;"></div>
+    </div>
+  </div>
+</div>
+
+</body></html>`,"text/html;charset=utf-8");
+}
+el("exportBarSummaryBtn").onclick=exportBarSummary;
+
+/* ---- Variance Report ---- */
+function exportVarianceReport(){
+  const nt=CONFIG.nightLabel||activeNightId;
+  if(!Object.keys(CONFIG.pars||{}).length&&!confirm("No par levels set. Export anyway?"))return;
+  const css=`:root{--bg:#0b1220;--card:#111a2e;--line:#203056;--muted:#a9b6d6;--text:#e8eefc;--red:#ff2d55;--green:#26d07c}*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);padding:16px}.pBtn{border-radius:12px;border:1px solid #2a3d6b;background:#1a3cff;color:#fff;padding:10px 14px;font-weight:700;cursor:pointer;margin-bottom:14px}.grpT{font-size:18px;font-weight:900;margin:16px 0 4px;color:#9fd3ff}.barT{font-size:15px;font-weight:800;margin:10px 0 4px}.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:6px 0}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}th,td{border-bottom:1px solid #22325b;padding:8px 6px;text-align:left}th{color:var(--muted);font-weight:600}.r{text-align:right}.vP{color:var(--green);font-weight:700}.vN{color:var(--red);font-weight:700}.vZ{color:var(--muted)}@media print{body{background:#fff;color:#000}.sec{background:#fff;border-color:#ccc}.pBtn{display:none}}`;
+  let body="";
+  for(const grp of _allGroups()){
+    body+=`<div class="grpT">🏢 ${escapeHtml(grp)}</div>`;
+    for(const sec of CONFIG.sections.filter(s=>(s.group||"Group 1")===grp)){
+      body+=`<div class="barT">🍺 ${escapeHtml(sec.bar)}</div>`;
+      for(const st of sec.stations){
+        let tT=0,tR=0;
+        const rows=CONFIG.items.map(item=>{const e=state?.[sec.bar]?.[st.station]?.[item]||{taken:0,returned:0};const t=e.taken||0,r=e.returned||0,n=t-r,par=getPar(item);tT+=t;tR+=r;return{item,t,r,n,par,v:par>0?n-par:null};}).sort((a,b)=>Math.abs(b.n)-Math.abs(a.n));
+        body+=`<div class="sec"><div style="font-weight:700;font-size:13px">${escapeHtml(st.bartender_name||st.station)}</div><div style="font-size:12px;color:var(--muted)">Taken:${tT} Ret:${tR} Net:${tT-tR}</div><table><thead><tr><th>Item</th><th class="r">Par</th><th class="r">Taken</th><th class="r">Ret.</th><th class="r">Net</th><th class="r">Variance</th></tr></thead><tbody>${rows.map(row=>{const vc=row.v===null?"vZ":row.v>0?"vP":row.v<0?"vN":"vZ";const vs=row.v===null?"N/A":row.v>0?"+"+row.v:String(row.v);return`<tr><td>${escapeHtml(row.item)}</td><td class="r">${row.par||"—"}</td><td class="r"><b>${row.t}</b></td><td class="r"><b>${row.r}</b></td><td class="r"><b>${row.n}</b></td><td class="r ${vc}"><b>${vs}</b></td></tr>`;}).join("")}</tbody></table></div>`;
+      }
+    }
+  }
+  downloadText(`variance_${safeFilePart(nt)}.html`,`<!doctype html><html><head><meta charset="utf-8"/><title>Variance</title><style>${css}</style></head><body><button class="pBtn" onclick="window.print()">🖨️ Print / Save PDF</button><h1>📈 Variance Report</h1><div style="color:var(--muted);font-size:12px;margin-bottom:14px">Night: <b>${escapeHtml(nt)}</b> · Par = expected NET</div>${body}
+<div id="apiLoginBackdrop" style="position:fixed;inset:0;background:rgba(10,15,25,.72);display:none;align-items:center;justify-content:center;z-index:99999;">
+  <div style="width:min(420px,92vw);background:#111827;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.35);">
+    <div style="font-size:20px;font-weight:800;margin-bottom:8px;">Inventory Login</div>
+    <div style="opacity:.8;margin-bottom:14px;">Login to sync this device with cloud inventory.</div>
+
+    <label style="display:block;margin-bottom:8px;">Username</label>
+    <input id="apiLoginUsername" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:12px;" />
+
+    <label style="display:block;margin-bottom:8px;">PIN</label>
+    <input id="apiLoginPin" type="password" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:14px;" />
+
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <button id="apiLoginBtn" style="padding:12px 16px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer;">Login</button>
+      <button id="apiSkipBtn" style="padding:12px 16px;border:1px solid #475569;border-radius:12px;background:transparent;color:#fff;cursor:pointer;">Local Only</button>
+      <div id="apiLoginMsg" style="font-size:13px;color:#fca5a5;"></div>
+    </div>
+  </div>
+</div>
+
+</body></html>`,"text/html;charset=utf-8");
+}
+el("exportVarianceBtn").onclick=exportVarianceReport;
+
+/* ---- All Nights CSV ---- */
+async function exportAllNightsTotals(){
+  const ok=await requirePin("export all nights"); if(!ok)return;
+  const allItems=new Set();
+  for(const cfg of Object.values(store.nights))(cfg.items||[]).forEach(i=>allItems.add(i));
+  const items=[...allItems].sort();
+  const hdr=["Night","Group","Bar","Station",...items.flatMap(i=>[i+" Taken",i+" Ret",i+" Net"])];
+  const lines=[hdr.map(csvCell).join(",")];
+  for(const [nid,cfg] of Object.entries(store.nights)){
+    const st=await loadNightState(nid);
+    for(const sec of cfg.sections||[])for(const stn of sec.stations||[]){
+      const row=[csvCell(cfg.nightLabel||nid),csvCell(sec.group||""),csvCell(sec.bar),csvCell(stn.bartender_name||stn.station)];
+      for(const item of items){const e=(st[sec.bar]||{})[stn.station]||{};const t=(e[item]||{}).taken||0,r=(e[item]||{}).returned||0;row.push(csvCell(t),csvCell(r),csvCell(t-r));}
+      lines.push(row.join(","));
+    }
+  }
+  downloadText(`all_nights_${safeFilePart(new Date().toLocaleDateString())}.csv`,lines.join("\n"),"text/csv;charset=utf-8");
+}
+el("exportAllNightsBtn").onclick=exportAllNightsTotals;
+
+/* ---- Compare ---- */
+function _mShow(id){el(id).style.display="flex";}
+function _mHide(id){el(id).style.display="none";}
+el("compareBtn").onclick=()=>{
+  const ids=Object.keys(store.nights);
+  const opts=ids.map(id=>`<option value="${escapeHtml(id)}">${escapeHtml(store.nights[id]?.nightLabel||id)}</option>`).join("");
+  el("compareSelA").innerHTML=opts; el("compareSelB").innerHTML=opts;
+  if(ids.length>=2){el("compareSelA").value=ids[0];el("compareSelB").value=ids[1];}
+  el("compareResult").innerHTML="";
+  _mShow("compareBackdrop");
+};
+el("closeCompareBtn").onclick=()=>_mHide("compareBackdrop");
+el("compareBackdrop").addEventListener("click",e=>{if(e.target===el("compareBackdrop"))_mHide("compareBackdrop");});
+el("runCompareBtn").onclick=async()=>{
+  const idA=el("compareSelA").value,idB=el("compareSelB").value; if(!idA||!idB)return;
+  const cfgA=store.nights[idA]||{},cfgB=store.nights[idB]||{};
+  const stA=await loadNightState(idA),stB=await loadNightState(idB);
+  const allItems=new Set([...(cfgA.items||[]),...(cfgB.items||[])]);
+  function agg(cfg,st){const o={};for(const item of allItems){let t=0,r=0;for(const sec of cfg.sections||[])for(const stn of sec.stations||[]){const e=(st[sec.bar]||{})[stn.station]||{};t+=(e[item]||{}).taken||0;r+=(e[item]||{}).returned||0;}o[item]={t,r,n:t-r};}return o;}
+  const aggA=agg(cfgA,stA),aggB=agg(cfgB,stB);
+  let rows="";
+  for(const item of allItems){const a=aggA[item]||{t:0,r:0,n:0},b=aggB[item]||{t:0,r:0,n:0},d=b.n-a.n;const col=d>0?"#26d07c":d<0?"#ff2d55":"var(--muted)";rows+=`<tr><td>${escapeHtml(item)}</td><td class="right"><b>${a.n}</b><span class="muted"> (T${a.t} R${a.r})</span></td><td class="right"><b>${b.n}</b><span class="muted"> (T${b.t} R${b.r})</span></td><td class="right" style="color:${col};font-weight:800">${d>=0?"+":""}${d}</td></tr>`;}
+  el("compareResult").innerHTML=`<div style="overflow-x:auto"><table><thead><tr><th>Item</th><th class="right">${escapeHtml(cfgA.nightLabel||idA)}</th><th class="right">${escapeHtml(cfgB.nightLabel||idB)}</th><th class="right">Diff</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+};
+
+/* ---- History ---- */
+el("historyBtn").onclick=async()=>{
+  const root=el("archiveCards"); root.innerHTML=""; el("archiveDetail").innerHTML="";
+  for(const [id,cfg] of Object.entries(store.nights)){
+    const st=await loadNightState(id);
+    let tT=0,tR=0;
+    for(const sec of cfg.sections||[])for(const stn of sec.stations||[])for(const item of cfg.items||[]){const e=(st[sec.bar]||{})[stn.station]||{};tT+=(e[item]||{}).taken||0;tR+=(e[item]||{}).returned||0;}
+    const grps=[...new Set((cfg.sections||[]).map(s=>s.group||"").filter(Boolean))].join(", ")||"—";
+    const card=document.createElement("div"); card.className="archCard";
+    card.innerHTML=`<div style="font-weight:800;font-size:14px">${escapeHtml(cfg.nightLabel||id)}</div>
+      <div style="color:var(--muted);font-size:12px;margin-top:4px">Groups: ${escapeHtml(grps)}</div>
+      <div style="color:var(--muted);font-size:12px">${(cfg.sections||[]).length} bars · ${(cfg.sections||[]).reduce((a,s)=>a+(s.stations||[]).length,0)} stations</div>
+      <div style="color:var(--muted);font-size:12px">Taken:${tT} · Ret:${tR} · Net:${tT-tR}</div>`;
+    card.onclick=async()=>{
+      const c2=store.nights[id]||{},s2=await loadNightState(id);
+      let html=`<div class="box"><b style="font-size:14px">${escapeHtml(c2.nightLabel||id)}</b>`;
+      for(const grp of [...new Set((c2.sections||[]).map(s=>s.group||"—"))]){
+        html+=`<div style="font-weight:900;font-size:13px;color:#9fd3ff;margin-top:12px">🏢 ${escapeHtml(grp)}</div>`;
+        for(const sec of (c2.sections||[]).filter(s=>(s.group||"—")===grp)){
+          html+=`<div style="font-weight:700;font-size:12px;color:var(--muted);margin-top:8px">🍺 ${escapeHtml(sec.bar)}</div><div class="log" style="max-height:160px;margin-top:4px"><table><thead><tr><th>Bartender</th>`;
+          for(const item of c2.items||[]) html+=`<th class="right">${escapeHtml(item)}</th>`;
+          html+=`</tr></thead><tbody>`;
+          for(const stn of sec.stations||[]){
+            html+=`<tr><td style="font-weight:700">${escapeHtml(stn.bartender_name||stn.station)}</td>`;
+            for(const item of c2.items||[]){const e=(s2[sec.bar]||{})[stn.station]||{};const n=((e[item]||{}).taken||0)-((e[item]||{}).returned||0);const col=n>0?"#26d07c":n<0?"#ff2d55":"var(--muted)";html+=`<td class="right" style="color:${col}">${n}</td>`;}
+            html+=`</tr>`;
+          }
+          html+=`</tbody></table></div>`;
+        }
+      }
+      html+=`</div>`;
+      el("archiveDetail").innerHTML=html;
+      el("archiveDetail").scrollIntoView({behavior:"smooth",block:"nearest"});
+    };
+    root.appendChild(card);
+  }
+  _mShow("historyBackdrop");
+};
+el("closeHistoryBtn").onclick=()=>_mHide("historyBackdrop");
+el("historyBackdrop").addEventListener("click",e=>{if(e.target===el("historyBackdrop"))_mHide("historyBackdrop");});
+
+/* ---- Bulk Apply ---- */
+el("bulkApplyBtn").onclick=()=>{
+  if(isLocked())return;
+  const iSel=el("bulkItem"); iSel.innerHTML="";
+  (CONFIG.items||[]).forEach(item=>iSel.appendChild(new Option(item,item)));
+  const root=el("bulkStationList"); root.innerHTML="";
+  for(const grp of _allGroups()){
+    const lbl=document.createElement("div");lbl.style.cssText="font-weight:800;font-size:12px;color:#9fd3ff;padding:6px 0 2px;";lbl.textContent="🏢 "+grp;root.appendChild(lbl);
+    for(const sec of CONFIG.sections.filter(s=>(s.group||"Group 1")===grp)){
+      for(const st of sec.stations||[]){
+        const row=document.createElement("div"); row.className="stCheck";
+        const cb=document.createElement("input"); cb.type="checkbox"; cb.value=sec.bar+"|||"+st.station;
+        if(sec.bar===bar&&st.station===station)cb.checked=true;
+        const l2=document.createElement("span"); l2.textContent="🍺 "+sec.bar+" / "+(st.bartender_name||st.station);
+        row.appendChild(cb); row.appendChild(l2);
+        row.onclick=e=>{if(e.target!==cb)cb.checked=!cb.checked;};
+        root.appendChild(row);
+      }
+    }
+  }
+  _mShow("bulkBackdrop");
+};
+async function _execBulk(action){
+  if(isLocked())return;
+  const ok=await requirePin("bulk apply"); if(!ok)return;
+  const item=el("bulkItem").value,qty=clampInt(el("bulkQty").value,1,9999);
+  const checked=[...el("bulkStationList").querySelectorAll("input:checked")].map(cb=>cb.value);
+  if(!checked.length){alert("Select at least one station.");return;}
+  if(!confirm(`Apply ${action==="taken"?"+ taken":"− returned"} ×${qty} "${item}" to ${checked.length} station(s)?`))return;
+  for(const key of checked){const [b,s]=key.split("|||");state[b]??={};state[b][s]??={};state[b][s][item]??={taken:0,returned:0};if(action==="taken")state[b][s][item].taken+=qty;else state[b][s][item].returned+=qty;log.push({ts:new Date().toISOString(),bar:b,station:s,item,action,qty,note:"bulk"});}
+  await saveNightState(activeNightId,state); await saveNightLog(activeNightId,log);
+  renderAll(); _mHide("bulkBackdrop"); toast(`Bulk ${action} ×${qty} → ${checked.length} station(s).`);
+}
+el("closeBulkBtn").onclick=()=>_mHide("bulkBackdrop");
+el("bulkBackdrop").addEventListener("click",e=>{if(e.target===el("bulkBackdrop"))_mHide("bulkBackdrop");});
+el("bulkSelectAll").onclick=()=>el("bulkStationList").querySelectorAll("input").forEach(c=>c.checked=true);
+el("bulkDeselectAll").onclick=()=>el("bulkStationList").querySelectorAll("input").forEach(c=>c.checked=false);
+el("bulkTakenBtn").onclick=()=>_execBulk("taken");
+el("bulkRetBtn").onclick=()=>_execBulk("returned");
+
+/* ---- Keyboard nav ---- */
+var _kbItem=null;
+document.addEventListener("keydown",e=>{
+  const tag=(e.target?.tagName||"").toLowerCase();
+  if(tag==="input"||tag==="textarea"||tag==="select")return;
+  if(isLocked())return;
+  const wrap=el("items"); if(!wrap)return;
+  const cards=[...wrap.querySelectorAll(".itemCard")]; if(!cards.length)return;
+  const gN=c=>{const n=c.querySelector(".itemName");return n?.childNodes[0]?.textContent?.trim()||n?.textContent.trim();};
+  const cur=_kbItem?cards.findIndex(c=>gN(c)===_kbItem):-1;
+  if(e.key==="ArrowDown"||e.key==="ArrowRight"){e.preventDefault();const nx=cards[Math.min(cur+1,cards.length-1)];if(nx){_kbItem=gN(nx);_kbHL(cards);}}
+  else if(e.key==="ArrowUp"||e.key==="ArrowLeft"){e.preventDefault();const pv=cards[Math.max(0,cur-1)];if(pv){_kbItem=gN(pv);_kbHL(cards);}}
+  else if((e.key==="+"||e.key==="=")&&_kbItem){e.preventDefault();applyAction(_kbItem,"taken",getQty());}
+  else if(e.key==="-"&&_kbItem){e.preventDefault();applyAction(_kbItem,"returned",getQty());}
+  else if(/^[1-9]$/.test(e.key)){const q=el("qty");if(q)q.value=e.key;}
+  // ESC closes extra modals
+  if(e.key==="Escape"){for(const id of ["compareBackdrop","historyBackdrop","bulkBackdrop"]){const bd=el(id);if(bd&&bd.style.display==="flex"){_mHide(id);return;}}}
+});
+function _kbHL(cards){const gN=c=>{const n=c.querySelector(".itemName");return n?.childNodes[0]?.textContent?.trim()||n?.textContent.trim();};cards.forEach(c=>{c.style.outline=gN(c)===_kbItem?"2px solid var(--blue)":"";});}
+
+/* =========================
+   Init
+========================= */
+try{
+  db = await openDB();
+}catch(e){
+  USE_LS = true;
+  alert("IndexedDB is blocked (often Safari Private Mode). Using localStorage fallback. For best reliability, open in normal mode.");
+}
+
+store = await loadStore();
+store.global ||= {pinHash:"", defaultBucketText:""};
+if(typeof store.global.defaultBucketText !== "string") store.global.defaultBucketText = "";
+
+if(!store.warehouse) store.warehouse = { items: [], transferLog: [], defaultUnit: "ml", defaultSize: 750 };
+if(!store.warehouse.transferLog) store.warehouse.transferLog = [];
+if(!store.warehouse.defaultUnit) store.warehouse.defaultUnit = "ml";
+if(!store.warehouse.defaultSize) store.warehouse.defaultSize = 750;
+for(const cfg of Object.values(store.nights||{})){
+  if(!cfg.pars) cfg.pars = {};
+  if(Array.isArray(cfg.sections)){
+    const hasAnyGroup = cfg.sections.some(s => s.group && s.group.trim());
+    if(!hasAnyGroup) cfg.sections.forEach(s => { if(!s.group) s.group = "Group 1"; });
+  }
+}
+
+activeNightId = nightKey(store.activeNightId);
+if(!store.nights[activeNightId]) activeNightId = Object.keys(store.nights)[0] || DEFAULT_NIGHT_ID;
+CONFIG = store.nights[activeNightId] || deepClone(DEFAULT_CONFIG);
+if(typeof CONFIG.locked !== "boolean") CONFIG.locked = false;
+CONFIG.items = normalizeItems(CONFIG.items || []);
+
+bindApiLoginUI();
+
+if(CLOUD_MODE && AUTH_TOKEN){
+  try{
+    await apiBootstrapCurrentNight();
+  }catch(e){
+    console.warn("Cloud bootstrap failed, falling back to login/local.", e);
+    state = await ensureState();
+    log = await loadNightLog(activeNightId);
+    showApiLogin(true);
+  }
+}else{
+  state = await ensureState();
+  log = await loadNightLog(activeNightId);
+  showApiLogin(true);
+}
+
+_curGroup = null;
+_ensureGroups();
+bar = (CONFIG.sections.find(s=>s.group===_curGroup)||CONFIG.sections[0])?.bar || "B1";
+station = (CONFIG.sections.find(s=>s.bar===bar)?.stations[0])?.station || "Bartender 1";
+
+wireNavigator();
+renderAll();
+updatePinStatus();
+renderSetup();
+
+
+
+
+/* =====================================================================
+   WAREHOUSE MODULE
+===================================================================== */
+
+/* ---- Helpers ---- */
+function whGet(){ return store.warehouse || (store.warehouse={items:[],transferLog:[],defaultUnit:"ml",defaultSize:750}); }
+function whSave(){ return saveStore(); }
+function whGenId(){ return "wh_"+Date.now()+"_"+Math.random().toString(36).slice(2,7); }
+/* ---- Import: BC Liquor Store Price List CSV (with UPC) ----
+   Expected columns (from your file):
+   PRODUCT_LONG_NAME, PRODUCT_BASE_UPC_NO, PRODUCT_LITRES_PER_CONTAINER,
+   ITEM_CATEGORY_NAME (optional), PRODUCT_SKU_NO (optional), PRODUCT_PRICE (optional)
+   This will MERGE into warehouse items + barcode registry (does not touch nights).
+*/
+function csvParse(text){
+  // Robust enough for typical CSV (quotes + commas). Not for multiline quoted fields.
+  const lines = text.replace(/\r/g,"").split("\n").filter(l=>l.trim().length);
+  if(!lines.length) return {headers:[], rows:[]};
+  const parseLine = (line)=>{
+    const out=[]; let cur=""; let inQ=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch === '"'){
+        if(inQ && line[i+1]==='"'){ cur+='"'; i++; }
+        else inQ = !inQ;
+      }else if(ch === "," && !inQ){
+        out.push(cur); cur="";
+      }else{
+        cur += ch;
+      }
+    }
+    out.push(cur);
+    return out.map(s=>s.trim());
+  };
+  const headers = parseLine(lines[0]);
+  const rows = [];
+  for(let i=1;i<lines.length;i++){
+    const cols = parseLine(lines[i]);
+    if(cols.length===1 && cols[0]==="") continue;
+    const row = {};
+    for(let c=0;c<headers.length;c++){
+      row[headers[c]] = cols[c] ?? "";
+    }
+    rows.push(row);
+  }
+  return {headers, rows};
+}
+function toUpcString(v){
+  if(v===null || v===undefined) return "";
+  let s = String(v).trim();
+  if(!s) return "";
+  // Handle scientific notation coming from Excel exports
+  if(/[eE]/.test(s)){
+    const n = Number(s);
+    if(Number.isFinite(n)) s = Math.round(n).toString();
+  }
+  // Remove trailing .0
+  if(/^\d+\.0$/.test(s)) s = s.slice(0,-2);
+  // Remove non-digits
+  s = s.replace(/[^\d]/g,"");
+  return s;
+}
+function litresToSizeUnit(litresRaw){
+  const n = Number(String(litresRaw||"").trim());
+  if(!Number.isFinite(n) || n<=0) return {size:"", unit:"ml"};
+  if(n>=1) return {size:String(Math.round(n*1000)), unit:"ml"}; // keep ml for consistency
+  return {size:String(Math.round(n*1000)), unit:"ml"};
+}
+async function whImportBclCsvText(csvText){
+  const {rows} = csvParse(csvText);
+  if(!rows.length){ toast("CSV is empty."); return; }
+
+  const wh = whGet();
+  if(!Array.isArray(wh.items)) wh.items = [];
+  if(!wh.barcodes) wh.barcodes = {};
+
+  // Build reverse map for existing barcodes -> itemId
+  const reg = bcGetRegistry();
+  const existingUpcs = new Set(Object.keys(reg));
+  const existingSku  = new Set((wh.items||[]).map(it=> String(it.sku||"").trim()).filter(Boolean));
+
+  let added=0, linked=0, skipped=0;
+
+  for(const r of rows){
+    const upc = toUpcString(r["PRODUCT_BASE_UPC_NO"] ?? r["UPC"] ?? r["upc"]);
+    const name = String(r["PRODUCT_LONG_NAME"] ?? r["NAME"] ?? "").trim();
+    const cat  = String(r["ITEM_CATEGORY_NAME"] ?? r["CATEGORY"] ?? "Other").trim() || "Other";
+    const sku  = String(r["PRODUCT_SKU_NO"] ?? r["SKU"] ?? "").trim();
+    const price = String(r["PRODUCT_PRICE"] ?? "").trim();
+    const abv = String(r["PRODUCT_ALCOHOL_PERCENT"] ?? "").trim();
+    const {size, unit} = litresToSizeUnit(r["PRODUCT_LITRES_PER_CONTAINER"]);
+    if(!name) { skipped++; continue; }
+
+    // If UPC already linked, skip.
+    if(upc && existingUpcs.has(upc)){ skipped++; continue; }
+
+    // If SKU already exists and has some barcode, skip duplicate item creation.
+    if(sku && existingSku.has(sku)){
+      // But if UPC exists, try to link it to that SKU item
+      if(upc){
+        const it = wh.items.find(x=>String(x.sku||"").trim()===sku);
+        if(it){
+          wh.barcodes[upc]=it.id;
+          existingUpcs.add(upc);
+          linked++;
+        }else skipped++;
+      }else skipped++;
+      continue;
+    }
+
+    // Create new warehouse item
+    const id = whGenId();
+    const item = {
+      id,
+      category: cat,
+      brand: name,
+      size: size || String(wh.defaultSize||750),
+      sizeUnit: unit || (wh.defaultUnit||"ml"),
+      stock: 0,
+      min: 0,
+      sku: sku || "",
+      price: price || "",
+      abv: abv || ""
+    };
+    wh.items.push(item);
+    if(sku) existingSku.add(sku);
+    added++;
+
+    // Link UPC if available
+    if(upc){
+      wh.barcodes[upc]=id;
+      existingUpcs.add(upc);
+      linked++;
+    }
+  }
+
+  await whSave();
+  whRender();
+  toast(`Imported: ${added} items • Linked: ${linked} barcodes • Skipped: ${skipped}`);
+}
+
+
+function whFormatSize(item){
+  const sz = item.size||""; const u = item.sizeUnit||item.unit||"ml";
+  return sz ? sz+u : "";
+}
+function whItemLabel(item){ return `${item.brand||""}${whFormatSize(item)?" – "+whFormatSize(item):""}`.trim() || item.id; }
+function whCategories(){
+  const seen=new Set(), out=[];
+  for(const it of (whGet().items||[])){
+    const c=it.category||"Other"; if(!seen.has(c)){seen.add(c);out.push(c);}
+  }
+  return out.length?out:[];
+}
+function whLowCount(cat){
+  return (whGet().items||[]).filter(it=>it.category===cat && Number(it.minStock)>0 && Number(it.stock)<Number(it.minStock)).length;
+}
+
+/* ---- State ---- */
+var _whCat = null;   // currently selected category
+
+/* ---- Render category tabs ---- */
+function whRenderCatTabs(){
+  const cats = whCategories();
+  if(!_whCat || !cats.includes(_whCat)) _whCat = cats[0]||null;
+  const wrap = el("whCatTabs"); if(!wrap) return;
+  wrap.innerHTML = "";
+
+  // "All" tab
+  const all = document.createElement("div");
+  all.className = "wh-catTab" + (_whCat===null?" active":"");
+  all.textContent = "📦 All";
+  all.onclick=()=>{ _whCat=null; whRenderCatTabs(); whRenderItems(); };
+  wrap.appendChild(all);
+
+  cats.forEach(cat=>{
+    const low = whLowCount(cat);
+    const d = document.createElement("div");
+    d.className = "wh-catTab" + (cat===_whCat?" active":"");
+    d.innerHTML = escapeHtml(cat) + (low?`<span class="wh-lowBadge">${low}</span>`:"");
+    d.onclick=()=>{ _whCat=cat; whRenderCatTabs(); whRenderItems(); };
+    wrap.appendChild(d);
+  });
+
+  // Refresh datalist
+  const dl = el("whCatList"); if(dl){ dl.innerHTML=""; cats.forEach(c=>{ const o=document.createElement("option"); o.value=c; dl.appendChild(o); }); }
+
+  // Auto-fill category input if one is selected
+  const cinp = el("whNewCat"); if(cinp && _whCat && !cinp.value) cinp.value = _whCat;
+}
+
+/* ---- Render items grid ---- */
+function whRenderItems(){
+  const wrap = el("whItems"); if(!wrap) return;
+  wrap.innerHTML = "";
+  const wh = whGet();
+  const items = (wh.items||[]).filter(it=> _whCat===null || it.category===_whCat);
+
+  if(!items.length){
+    wrap.innerHTML = `<div class="muted small" style="grid-column:1/-1;padding:12px;">No items${_whCat?" in "+escapeHtml(_whCat):""}. Add one below.</div>`;
+    return;
+  }
+
+  // Group by category if "All"
+  const groups = _whCat ? {[_whCat]: items} :
+    items.reduce((a,it)=>{ (a[it.category||"Other"]||=[]).push(it); return a; },{});
+
+  for(const [grp, grpItems] of Object.entries(groups)){
+    if(_whCat===null){
+      const grpHdr = document.createElement("div");
+      grpHdr.style.cssText="grid-column:1/-1;font-weight:900;font-size:14px;color:#9fd3ff;padding:6px 0 2px;";
+      grpHdr.textContent = "📦 "+grp;
+      wrap.appendChild(grpHdr);
+    }
+    for(const item of grpItems){
+      const stock = Number(item.stock)||0;
+      const minSt = Number(item.minStock)||0;
+      const isLow = minSt>0 && stock<minSt;
+      const card = document.createElement("div");
+      card.className = "wh-itemCard" + (isLow?" wh-low":(stock>0?" wh-ok":""));
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div>
+            <div style="font-weight:800;font-size:14px;">${escapeHtml(item.brand||"—")}</div>
+            <div style="font-size:11px;color:var(--muted);">${escapeHtml(item.category||"")}${whFormatSize(item)?" · "+escapeHtml(whFormatSize(item)):""}</div>
+            ${isLow?`<div class="wh-lowAlert">⚠ Low stock (min ${minSt})</div>`:""}
+          </div>
+          <div class="wh-stockBox">
+            <div class="wh-stockNum" id="whStock_${item.id}">${stock}</div>
+            <div class="wh-stockSub">bottles</div>
+          </div>
+        </div>
+        <div class="wh-pm">
+          <button class="wh-minus" data-whid="${item.id}" data-act="dec">−</button>
+          <button class="wh-plus"  data-whid="${item.id}" data-act="inc">+</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btnGray miniBtn" data-whid="${item.id}" data-act="transfer" style="flex:1;">↗ Transfer to Bar</button>
+          <button class="btnGray miniBtn" data-whid="${item.id}" data-act="setMin"   style="flex:0;">⚙ Min</button>
+          <button class="btnRed  miniBtn" data-whid="${item.id}" data-act="del"      style="flex:0;">🗑</button>
+        </div>`;
+      wrap.appendChild(card);
+    }
+  }
+
+  // Wire buttons
+  wrap.querySelectorAll("[data-whid]").forEach(btn=>{
+    btn.onclick = async()=>{
+      const id   = btn.getAttribute("data-whid");
+      const act  = btn.getAttribute("data-act");
+      const wh   = whGet();
+      const item = wh.items.find(i=>i.id===id);
+      if(!item) return;
+
+      if(act==="inc"){
+        item.stock = (Number(item.stock)||0) + 1;
+        await whSave(); whRenderItems(); whRenderCatTabs();
+      } else if(act==="dec"){
+        if((Number(item.stock)||0) <= 0) return;
+        item.stock = (Number(item.stock)||0) - 1;
+        await whSave(); whRenderItems(); whRenderCatTabs();
+      } else if(act==="setMin"){
+        const val = prompt(`Minimum stock alert for "${whItemLabel(item)}":\n(0 = disabled)`, item.minStock||0);
+        if(val===null) return;
+        item.minStock = Math.max(0, parseInt(val)||0);
+        await whSave(); whRenderItems(); whRenderCatTabs();
+      } else if(act==="transfer"){
+        const qty = prompt(`Transfer how many bottles of "${whItemLabel(item)}" to bar?\n(Current stock: ${item.stock})`, 1);
+        if(qty===null) return;
+        const n = Math.max(1, parseInt(qty)||1);
+        if(n > (Number(item.stock)||0)){ alert("Not enough stock."); return; }
+        const dest = prompt("Destination bar name:", bar||"Bar");
+        if(dest===null) return;
+        item.stock = (Number(item.stock)||0) - n;
+        wh.transferLog.unshift({ ts: new Date().toISOString(), item: whItemLabel(item), qty: n, to: dest, note:"" });
+        if(wh.transferLog.length > 200) wh.transferLog.length = 200;
+        await whSave(); whRenderItems(); whRenderCatTabs(); whRenderLog();
+        toast(`Transferred ${n}× ${whItemLabel(item)} → ${dest}`);
+      } else if(act==="del"){
+        if(!confirm(`Delete "${whItemLabel(item)}" from warehouse?`)) return;
+        wh.items = wh.items.filter(i=>i.id!==id);
+        await whSave(); whRenderCatTabs(); whRenderItems();
+      }
+    };
+  });
+}
+
+/* ---- Transfer log ---- */
+function whRenderLog(){
+  const tbody = el("whTransferLog"); if(!tbody) return;
+  const log = (whGet().transferLog||[]).slice(0,50);
+  if(!log.length){ tbody.innerHTML=`<tr><td colspan="5" class="muted" style="padding:10px;">No transfers yet.</td></tr>`; return; }
+  tbody.innerHTML = log.map(e=>`<tr>
+    <td class="muted" style="font-size:11px;white-space:nowrap;">${new Date(e.ts).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</td>
+    <td style="font-weight:700;">${escapeHtml(e.item)}</td>
+    <td style="text-align:center;font-weight:900;">×${e.qty}</td>
+    <td>${escapeHtml(e.to||"")}</td>
+    <td class="muted">${escapeHtml(e.note||"")}</td>
+  </tr>`).join("");
+}
+
+/* ---- Size presets ---- */
+const WH_SIZE_PRESETS_ML = [200,350,500,700,750,1000,1750];
+const WH_SIZE_PRESETS_L  = [0.2,0.35,0.5,0.7,0.75,1,1.75];
+
+function whRenderSizePresets(){
+  const wh = whGet();
+  const unit = wh.defaultUnit||"ml";
+  const presets = unit==="ml" ? WH_SIZE_PRESETS_ML : WH_SIZE_PRESETS_L;
+  const wrap = el("whSizePresets"); if(!wrap) return;
+  wrap.innerHTML = "";
+  presets.forEach(sz=>{
+    const btn = document.createElement("button");
+    btn.className = "wh-sizePreset" + (String(sz)===String(wh.defaultSize)?" active":"");
+    btn.textContent = sz+unit;
+    btn.onclick = ()=>{
+      whGet().defaultSize = sz;
+      el("whNewSize").value = sz;
+      el("whNewUnit").value = unit;
+      saveStore();
+      whRenderSizePresets();
+    };
+    wrap.appendChild(btn);
+  });
+  // Set active unit button
+  el("whUnitMl")?.classList.toggle("active", unit==="ml");
+  el("whUnitL" )?.classList.toggle("active", unit==="L");
+}
+
+// Unit toggle
+el("whUnitMl").onclick=()=>{
+  whGet().defaultUnit="ml"; whGet().defaultSize=750;
+  el("whNewUnit").value="ml"; el("whNewSize").value="750";
+  saveStore(); whRenderSizePresets();
+};
+el("whUnitL").onclick=()=>{
+  whGet().defaultUnit="L"; whGet().defaultSize=0.75;
+  el("whNewUnit").value="L"; el("whNewSize").value="0.75";
+  saveStore(); whRenderSizePresets();
+};
+
+/* ---- Add item ---- */
+el("whAddItemBtn").onclick = async()=>{
+  const cat   = el("whNewCat").value.trim();
+  const brand = el("whNewBrand").value.trim();
+  const size  = el("whNewSize").value.trim();
+  const unit  = el("whNewUnit").value;
+  const stock = Math.max(0, parseInt(el("whNewStock").value)||0);
+  const minSt = Math.max(0, parseInt(el("whNewMin").value)||0);
+
+  if(!cat)  { alert("Enter a category (e.g. Vodka)"); return; }
+  if(!brand){ alert("Enter a brand/type name"); return; }
+
+  const wh = whGet();
+  // Check duplicate
+  const dup = wh.items.find(i=>i.category===cat && i.brand===brand && (i.size||"")===size && (i.sizeUnit||i.unit||"ml")===unit);
+  if(dup){ alert("This item already exists. Update its stock directly on the card."); return; }
+
+  wh.items.push({ id: whGenId(), category: cat, brand, size, sizeUnit: unit, stock, minStock: minSt });
+  _whCat = cat;
+  await whSave();
+  // Clear form (keep category for easy multi-add)
+  el("whNewBrand").value=""; el("whNewStock").value="0"; el("whNewMin").value="0";
+  whRenderCatTabs(); whRenderItems();
+  toast(`Added: ${brand}${size?" ("+size+unit+")":""}`);
+};
+
+/* ---- Import BC Liquor CSV ---- */
+el("whImportBclBtn").onclick = ()=> el("whImportBclFile").click();
+el("whImportBclFile").addEventListener("change", async(e)=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const txt = await f.text();
+  await whImportBclCsvText(txt);
+  e.target.value = "";
+});
+
+/* ---- Export warehouse CSV ---- */
+el("whExportBtn").onclick=()=>{
+  const wh = whGet();
+  const rows = [["Category","Brand/Type","Size","Unit","Stock","Min Stock"].map(csvCell).join(",")];
+  for(const it of wh.items||[]){
+    rows.push([csvCell(it.category),csvCell(it.brand),csvCell(it.size),csvCell(it.sizeUnit||it.unit||"ml"),csvCell(it.stock),csvCell(it.minStock||0)].join(","));
+  }
+  downloadText(`warehouse_${safeFilePart(new Date().toLocaleDateString())}.csv`, rows.join("\n"), "text/csv;charset=utf-8");
+};
+
+/* ---- Open / close warehouse ---- */
+function openWarehouse(){
+  const wh = whGet();
+  // Set default unit buttons
+  el("whNewUnit").value = wh.defaultUnit||"ml";
+  el("whNewSize").value = wh.defaultSize||750;
+  whRenderSizePresets();
+  whRenderCatTabs();
+  whRenderItems();
+  whRenderLog();
+  el("warehouseBackdrop").style.display="flex";
+}
+el("warehouseBtn").onclick = openWarehouse;
+el("closeWhBtn").onclick   = ()=>{ el("warehouseBackdrop").style.display="none"; };
+el("warehouseBackdrop").addEventListener("click", e=>{
+  if(e.target===el("warehouseBackdrop")) el("warehouseBackdrop").style.display="none";
+});
+// ESC
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape" && el("warehouseBackdrop")?.style.display==="flex")
+    el("warehouseBackdrop").style.display="none";
+});
+
+
+
+/* =====================================================================
+   BARCODE SCANNER MODULE
+   - USB/Bluetooth HID scanner: fires keystrokes fast → detected by timing
+   - Camera: ZXing library via CDN
+===================================================================== */
+
+/* ---- Barcode ↔ item registry ---- */
+// Stored in store.warehouse.barcodes = { "barcode_string": "item_id" }
+function bcGetRegistry(){ const wh=whGet(); if(!wh.barcodes) wh.barcodes={}; return wh.barcodes; }
+function bcLookup(code){ return bcGetRegistry()[code.trim()]||null; }
+function bcRegister(code, itemId){ bcGetRegistry()[code.trim()]=itemId; return whSave(); }
+function bcUnregister(code){ delete bcGetRegistry()[code.trim()]; return whSave(); }
+
+/* ---- Hardware scanner detection ----
+   Scanners type very fast (< 50ms between chars) then send Enter.
+   We buffer input and fire on Enter or after a speed-burst. */
+var _bcBuf = "";
+var _bcLastKey = 0;
+const BC_SPEED_THRESHOLD = 60; // ms — faster than human typing
+const BC_MIN_LEN = 4;
+
+function bcSetStatus(msg, cls){
+  const s = el("bcStatus"); if(!s) return;
+  s.textContent = msg;
+  s.className = "bc-status" + (cls?" "+cls:"");
+}
+function bcSetInputState(cls){
+  const inp = el("bcInput"); if(!inp) return;
+  inp.className = "bc-input" + (cls?" "+cls:"");
+}
+
+/* Wire the manual input field */
+el("bcInput").addEventListener("keydown", e=>{
+  const now = Date.now();
+  const gap = now - _bcLastKey;
+  _bcLastKey = now;
+
+  // Detect hardware scanner burst (very fast typing)
+  if(gap < BC_SPEED_THRESHOLD && e.key.length===1) _bcBuf += e.key;
+  else if(e.key.length===1 && e.key !== "Enter") _bcBuf = e.key;
+
+  if(e.key==="Enter"){
+    e.preventDefault();
+    const code = (el("bcInput").value||_bcBuf).trim();
+    _bcBuf = "";
+    if(code.length >= BC_MIN_LEN) bcHandleScan(code);
+    else bcSetStatus("Too short — need ≥ "+BC_MIN_LEN+" chars", "bc-warn");
+  }
+});
+
+// Also handle paste (for testing)
+el("bcInput").addEventListener("paste", e=>{
+  setTimeout(()=>{
+    const code = (el("bcInput").value||"").trim();
+    if(code.length >= BC_MIN_LEN){ el("bcInput").value=""; bcHandleScan(code); }
+  }, 50);
+});
+
+/* ---- Main scan handler ---- */
+function bcHandleScan(code){
+  el("bcInput").value = "";
+  bcSetInputState("");
+  const itemId = bcLookup(code);
+  const wh = whGet();
+
+  if(itemId){
+    const item = wh.items.find(i=>i.id===itemId);
+    if(item){
+      bcSetStatus("✓ Found: "+escapeHtml(item.brand||""), "bc-ok");
+      bcSetInputState("bc-found");
+      bcShowActionPopup(item, code);
+      return;
+    }
+  }
+
+  // Not found — offer to register
+  bcSetStatus("⚠ Barcode not registered", "bc-warn");
+  bcSetInputState("bc-notfound");
+  bcShowRegisterPopup(code);
+}
+
+/* ---- Action popup: IN / OUT / TRANSFER ---- */
+function bcShowActionPopup(item, code){
+  const popup = el("bcPopup"); if(!popup) return;
+  const stock = Number(item.stock)||0;
+  const fmt = whFormatSize(item);
+  popup.style.display="block";
+  popup.innerHTML = `
+    <div class="bc-popup">
+      <div class="bc-itemTitle">📦 ${escapeHtml(item.brand||"")}</div>
+      <div class="muted small">${escapeHtml(item.category||"")}${fmt?" · "+escapeHtml(fmt):""} &nbsp;|&nbsp; Stock: <b>${stock}</b></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">Barcode: <span style="font-family:monospace;">${escapeHtml(code)}</span></div>
+      <div class="bc-actionGrid">
+        <button class="bc-actionBtn bc-in"  id="bcActIn">📥 Stock IN</button>
+        <button class="bc-actionBtn bc-out" id="bcActOut">📤 Stock OUT</button>
+        <button class="bc-actionBtn bc-trn" id="bcActTrn">↗ Transfer</button>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <label style="font-size:12px;color:var(--muted);margin:0;">Qty:</label>
+        <input id="bcQty" type="number" min="1" value="1"
+          style="width:80px;font-size:15px;font-weight:800;text-align:center;padding:8px;border-radius:10px;"/>
+        <button class="btnGray miniBtn" id="bcActCancel">Cancel</button>
+        <button class="btnGray miniBtn" id="bcUnlinkBtn"
+          style="margin-left:auto;font-size:11px;color:var(--muted);">Unlink barcode</button>
+      </div>
+    </div>`;
+
+  // Focus qty input
+  setTimeout(()=>{ el("bcQty")?.select(); }, 50);
+
+  async function doAction(action){
+    const qty = Math.max(1, parseInt(el("bcQty")?.value)||1);
+    const wh2 = whGet();
+    const it2 = wh2.items.find(i=>i.id===item.id);
+    if(!it2) return;
+
+    if(action==="in"){
+      it2.stock = (Number(it2.stock)||0) + qty;
+      await whSave();
+      bcSetStatus(`+${qty} → ${it2.brand} (stock: ${it2.stock})`, "bc-ok");
+      toast(`📥 Stock IN ×${qty}: ${it2.brand}`);
+    } else if(action==="out"){
+      if(qty > (Number(it2.stock)||0)){ bcSetStatus("Not enough stock!", "bc-err"); return; }
+      it2.stock = (Number(it2.stock)||0) - qty;
+      await whSave();
+      bcSetStatus(`−${qty} → ${it2.brand} (stock: ${it2.stock})`, "bc-ok");
+      toast(`📤 Stock OUT ×${qty}: ${it2.brand}`);
+    } else if(action==="transfer"){
+      if(qty > (Number(it2.stock)||0)){ bcSetStatus("Not enough stock!", "bc-err"); return; }
+      it2.stock = (Number(it2.stock)||0) - qty;
+      wh2.transferLog.unshift({ ts: new Date().toISOString(), item: whItemLabel(it2), qty, to: bar||"Bar", note:"barcode" });
+      if(wh2.transferLog.length>200) wh2.transferLog.length=200;
+      await whSave();
+      bcSetStatus(`↗ ${qty}× → ${bar||"Bar"}`, "bc-ok");
+      toast(`↗ Transferred ×${qty}: ${it2.brand}`);
+      whRenderLog();
+    }
+
+    popup.style.display="none";
+    bcSetInputState("");
+    whRenderItems(); whRenderCatTabs();
+    // Re-focus scanner input
+    setTimeout(()=>el("bcInput")?.focus(), 100);
+  }
+
+  el("bcActIn" ).onclick = ()=>doAction("in");
+  el("bcActOut").onclick = ()=>doAction("out");
+  el("bcActTrn").onclick = ()=>doAction("transfer");
+  el("bcActCancel").onclick = ()=>{ popup.style.display="none"; bcSetStatus("Ready"); bcSetInputState(""); el("bcInput")?.focus(); };
+  el("bcUnlinkBtn").onclick = async()=>{
+    if(!confirm(`Unlink barcode "${code}" from "${item.brand}"?`)) return;
+    await bcUnregister(code);
+    popup.style.display="none"; bcSetStatus("Unlinked", "bc-warn");
+    el("bcInput")?.focus();
+  };
+
+  // Enter on qty = Stock IN by default
+  el("bcQty").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); doAction("in"); } });
+}
+
+/* ---- Register popup: link barcode to item ---- */
+function bcShowRegisterPopup(code){
+  const popup = el("bcPopup"); if(!popup) return;
+  const wh = whGet();
+  const opts = (wh.items||[]).map(it=>`<option value="${escapeHtml(it.id)}">${escapeHtml(it.category||"")} — ${escapeHtml(it.brand||"")}${whFormatSize(it)?" ("+whFormatSize(it)+")":""}</option>`).join("");
+  popup.style.display="block";
+  popup.innerHTML = `
+    <div class="bc-popup" style="border-color:#ffb340;">
+      <div class="bc-itemTitle" style="color:#ffb340;">⚠ Barcode not registered</div>
+      <div class="muted small" style="margin-bottom:10px;font-family:monospace;">${escapeHtml(code)}</div>
+      ${opts ? `
+        <div style="margin-bottom:8px;"><b style="font-size:13px;">Link to existing item:</b></div>
+        <div class="flex" style="gap:8px;flex-wrap:wrap;">
+          <select id="bcRegSel" style="flex:1;min-width:200px;">${opts}</select>
+          <button class="btnGreen miniBtn" id="bcRegLinkBtn">Link Barcode</button>
+        </div>
+        <div style="margin:10px 0;text-align:center;color:var(--muted);font-size:12px;">— or —</div>` : ""}
+      <div class="help" style="margin-bottom:6px;">Add as new item with this barcode:</div>
+      <div class="wh-form">
+        <div><label>Category</label><input id="bcRegCat" placeholder="e.g. Vodka" list="whCatList"/></div>
+        <div><label>Brand / Type</label><input id="bcRegBrand" placeholder="e.g. Grey Goose"/></div>
+        <div><label>Size</label>
+          <input id="bcRegSize" placeholder="750" style="width:75px;display:inline-block;"/>
+          <select id="bcRegUnit" style="width:65px;display:inline-block;margin-left:4px;">
+            <option value="ml">ml</option><option value="L">L</option>
+          </select>
+        </div>
+        <div><label>Opening Stock</label><input id="bcRegStock" type="number" min="0" value="1"/></div>
+        <div><label>Min Stock</label><input id="bcRegMin" type="number" min="0" value="0"/></div>
+      </div>
+      <div class="rightFlex" style="margin-top:10px;gap:8px;">
+        <button class="btnGray miniBtn" id="bcRegCancel">Cancel</button>
+        <button class="btnBlue miniBtn" id="bcRegAddBtn">+ Add & Link</button>
+      </div>
+    </div>`;
+
+  if(opts){
+    el("bcRegLinkBtn").onclick = async()=>{
+      const selId = el("bcRegSel").value;
+      if(!selId) return;
+      await bcRegister(code, selId);
+      const it = wh.items.find(i=>i.id===selId);
+      popup.style.display="none";
+      bcSetStatus("✓ Linked: "+(it?.brand||""), "bc-ok");
+      bcSetInputState("");
+      toast("Barcode linked to "+( it?.brand||"item"));
+      el("bcInput")?.focus();
+    };
+  }
+
+  el("bcRegAddBtn").onclick = async()=>{
+    const cat   = el("bcRegCat").value.trim();
+    const brand = el("bcRegBrand").value.trim();
+    const size  = el("bcRegSize").value.trim();
+    const unit  = el("bcRegUnit").value;
+    const stock = Math.max(0, parseInt(el("bcRegStock").value)||0);
+    const minSt = Math.max(0, parseInt(el("bcRegMin").value)||0);
+    if(!cat||!brand){ alert("Category and Brand are required."); return; }
+    const newId = whGenId();
+    wh.items.push({ id:newId, category:cat, brand, size, sizeUnit:unit, stock, minStock:minSt });
+    await bcRegister(code, newId); // also saves
+    _whCat = cat;
+    popup.style.display="none";
+    bcSetStatus("✓ Added & linked: "+brand, "bc-ok");
+    bcSetInputState("");
+    whRenderCatTabs(); whRenderItems();
+    toast("Added & linked: "+brand);
+    el("bcInput")?.focus();
+  };
+
+  el("bcRegCancel").onclick = ()=>{ popup.style.display="none"; bcSetStatus("Ready"); bcSetInputState(""); el("bcInput")?.focus(); };
+}
+
+/* ---- Camera scanner (ZXing / BarcodeDetector fallback) ---- */
+async function bcStartNativeDetector(){
+  // Uses built-in BarcodeDetector when ZXing CDN is unavailable.
+  if(!("BarcodeDetector" in window)) return false;
+  try{
+    const formats = ["ean_13","ean_8","code_128","code_39","upc_a","upc_e","qr_code"];
+    const detector = new BarcodeDetector({formats});
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio:false });
+    const video = el("bcCamVideo");
+    video.srcObject = stream;
+    await video.play();
+    _bcReader = { stream, detector, stop: ()=>{ stream.getTracks().forEach(t=>t.stop()); } };
+    bcSetStatus("Camera (native) — scanning…");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d", { willReadFrequently:true });
+    const loop = async()=>{
+      if(!_bcCamActive) return;
+      try{
+        if(video.videoWidth && video.videoHeight){
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const bitmap = await createImageBitmap(canvas);
+          const codes = await detector.detect(bitmap);
+          if(codes && codes.length){
+            const val = (codes[0].rawValue||"").trim();
+            if(val){
+              bcHandleScan(val);
+              bcStopCamera();
+              return;
+            }
+          }
+        }
+      }catch(e){}
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+/* ---- Camera scanner (ZXing) ---- */
+var _bcCamActive = false;
+var _bcReader = null;
+
+el("bcCamBtn").onclick = async()=>{
+  if(_bcCamActive){ bcStopCamera(); return; }
+  el("bcCamOverlay").style.display="flex";
+  _bcCamActive = true;
+  try{
+    const ZXing = window.ZXing || window.ZXingBrowser;
+    if(!ZXing){
+      // Fallback to built-in BarcodeDetector (works offline on supported browsers)
+      const okNative = await bcStartNativeDetector();
+      if(!okNative){
+        bcSetStatus("Scanner not available offline. Type barcode or open online once.");
+        toast("Camera scanner needs ZXing (online) or a supported browser BarcodeDetector.");
+        bcStopCamera();
+      }
+      return;
+    }
+
+    const hints = new Map();
+    const formats = [
+      ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
+      ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+      ZXing.BarcodeFormat.UPC_A, ZXing.BarcodeFormat.UPC_E,
+      ZXing.BarcodeFormat.QR_CODE,
+    ];
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
+
+    _bcReader = new ZXing.BrowserMultiFormatReader(hints);
+    await _bcReader.decodeFromVideoDevice(null, "bc-video", (result, err)=>{
+      if(result){
+        const code = result.getText();
+        bcStopCamera();
+        bcHandleScan(code);
+      }
+    });
+  }catch(e){
+    alert("Camera error: "+e.message);
+    bcStopCamera();
+  }
+};
+
+function bcStopCamera(){
+  _bcCamActive = false;
+  if(_bcReader){ try{ _bcReader.reset(); }catch(e){} _bcReader=null; }
+  el("bcCamOverlay").style.display="none";
+}
+el("bcCamClose").onclick = bcStopCamera;
+
+/* Auto-focus scanner input when warehouse opens */
+const _origOpenWarehouse = openWarehouse;
+openWarehouse = function(){
+  _origOpenWarehouse();
+  setTimeout(()=>el("bcInput")?.focus(), 100);
+};
+
+
+})();</script>
+
+<div id="apiLoginBackdrop" style="position:fixed;inset:0;background:rgba(10,15,25,.72);display:none;align-items:center;justify-content:center;z-index:99999;">
+  <div style="width:min(420px,92vw);background:#111827;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.35);">
+    <div style="font-size:20px;font-weight:800;margin-bottom:8px;">Inventory Login</div>
+    <div style="opacity:.8;margin-bottom:14px;">Login to sync this device with cloud inventory.</div>
+
+    <label style="display:block;margin-bottom:8px;">Username</label>
+    <input id="apiLoginUsername" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:12px;" />
+
+    <label style="display:block;margin-bottom:8px;">PIN</label>
+    <input id="apiLoginPin" type="password" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:#fff;margin-bottom:14px;" />
+
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <button id="apiLoginBtn" style="padding:12px 16px;border:none;border-radius:12px;background:#2563eb;color:#fff;font-weight:700;cursor:pointer;">Login</button>
+      <button id="apiSkipBtn" style="padding:12px 16px;border:1px solid #475569;border-radius:12px;background:transparent;color:#fff;cursor:pointer;">Local Only</button>
+      <div id="apiLoginMsg" style="font-size:13px;color:#fca5a5;"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
